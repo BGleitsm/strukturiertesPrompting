@@ -1,151 +1,83 @@
-# Wissenschaftliche Wissensaufbereitung mit GenAI -- Workshop 2 Repository
+# Strukturiertes Prompting & Wissensaufbereitung -- Workshop Repository
 
 ![Status](https://img.shields.io/badge/status-active-blue)
-![Focus](https://img.shields.io/badge/focus-scientific%20evidence-critical)
+![Focus](https://img.shields.io/badge/focus-regulated%20AI-critical)
 ![License](https://img.shields.io/badge/license-internal-lightgrey)
 
-Repository für evidenzpflichtige, auditierbare KI-Workflows in der wissenschaftlichen Wissensaufbereitung  
-(insbesondere regulierte Kontexte wie Pharma, Behörden, Qualitätsdokumentation).
+Repository für strukturiertes, auditierbares Prompting im Pharma- und
+Behördenkontext.
+Schwerpunkt: reproduzierbare Prompt-Architekturen, regulatorische
+Nachvollziehbarkeit, wissenschaftliche Evidenzpflicht und Advanced-Workflows.
 
-**Schwerpunkt:** Evidence-first Prompting · strukturierte Outputs · Verifier-Logik · Traceability
+------------------------------------------------------------------------
 
----
+## Quick Start
 
-## Quick Start – Wissenschaftliches Arbeiten mit GenAI
+1.  Prinzip: **Task → Kontext → Struktur → Output-Format**
+2.  Delimiter konsequent einsetzen (`<<<INPUT>>>`, XML, Markdown-Blöcke)
+3.  Output explizit spezifizieren (Tabellen, JSON, strukturierte Bulletpoints)
+4.  **Evidenzpflicht:** Wichtige Aussagen immer mit Zitat und Fundstelle belegen und fehlende Infos als "UNBEKANNT" zulassen.
+5.  Ergebnisse fachlich validieren
 
-**Grundprinzip:**  
-> Nur belegen, was im Input steht – alles andere ist UNBEKANNT.
+------------------------------------------------------------------------
 
-1. Output-Struktur vorab definieren (Schema-first)
-2. Jede Kernaussage mit Evidence Snippet + Location versehen
-3. Fakten und Interpretation strikt trennen
-4. Fehlende Information explizit als `UNBEKANNT` kennzeichnen
-5. Verifier-Step verpflichtend bei Zahlen & Compliance-Bezug
+## Repository-Struktur
 
----
+    .
+    ├── Workshop1_Grundlagen_Prompting
+    │   ├── Kernprinzipien
+    │   ├── Template-Strukturen
+    │   └── Regulatorische Use Cases
+    │
+    ├── Workshop1_Advanced_R_CustomGPT
+    │   ├── Strukturierte Code-Generierung (R)
+    │   ├── Validierungslogik
+    │   ├── Prüfmechanismen
+    │   └── CustomGPT-Workflow-Architektur
+    │
+    ├── Workshop2_Wissenschaftliche_Wissensaufbereitung
+    │   ├── Extrahieren_Transformieren
+    │   ├── Zusammenfassen_Konsolidieren
+    │   └── Pruefen_Bewerten
+    │
+    └── README.md
 
-## Methodischer Kern
+------------------------------------------------------------------------
 
-### 1. Evidenzpflicht
+## Kerninhalte
 
-- Jede relevante Aussage benötigt:
-  - Zitat (Evidence Snippet)
-  - Fundstelle (Dokument / Seite / Zeile)
-- Keine erfundenen Zahlen, Quellen oder Normen
-- Keine impliziten Ergänzungen
+### Workshop 1: Grundlagen -- Strukturiertes Prompting
+-   Saubere Task-Definition
+-   Delimiter-Architektur (Markdown/XML)
+-   Output-Kontrolle
+-   Fehler- und Halluzinationsreduktion
+-   Einsatz im regulierten Umfeld
 
----
+### Workshop 1: Advanced -- R & CustomGPT
+-   Deterministische Code-Generierung
+-   Eingebaute Validierungsroutinen
+-   Strukturierte Analyse-Workflows
+-   Governance-Design für CustomGPT-Systeme
 
-### 2. Delimiter-Architektur
+### Workshop 2: Wissenschaftliche Wissensaufbereitung mit GenAI
+-   **Zentrale Regeln:** Strikte Evidenzpflicht (Zitat + Location), Trennung von Fakt und Interpretation, sowie das Zulassen von UNBEKANNT ohne freie Erfindungen.
+-   **Extrahieren & Transformieren:** Schema-first Ansatz für die Extraktion in strukturierte Formate wie JSON und Tabellen inklusive Fundstellen.
+-   **Zusammenfassen & Konsolidieren:** Konsolidierung von Studien (PICO) und Erstellung von Multi-Source-Zusammenfassungen samt Konfliktlogs.
+-   **Prüfen & Bewerten:** Einsatz von Rubrik-Scoring, Abgleich mit Leitlinien/DIN-Normen und Halluzinations-Guardrails durch einen dedizierten Verifier-Step.
 
-Konsequente Trennung von Input und Arbeitsanweisung:
-<<<INPUT>>>
-...
-<<<END>>>
+------------------------------------------------------------------------
 
-Verhindert Kontextvermischung und reduziert Halluzinationen.
+## Zielsetzung
 
----
+-   Standardisierung von Prompt-Architekturen
+-   Minimierung regulatorischer Risiken
+-   Nachvollziehbare AI-Workflows (Audit Trails)
+-   Transfer in Weiterbildung und Hochschulkontext
 
-### 3. Schema-first-Prinzip
-
-Erst Output-Format festlegen, z. B.:
-
-- JSON-Struktur
-- Bewertungstabelle
-- Requirement-Matrix
-- Findings Log
-- Konfliktprotokoll
-
-Dann Verarbeitung des Inputs.
-
----
-
-### 4. Verifier-Logik (Guardrail)
-
-Zweiter Prompt als Prüfinstanz:
-
-- Aussage gegen Originaltext abgleichen
-- Status: `belegt` / `unbelegt`
-- Korrektur + Fundstelle angeben
-- „No answer allowed“, wenn keine Evidenz vorhanden
-
----
-
-## Zentrale Use-Case-Kategorien
-
-### A) Extrahieren & Transformieren
-
-**Typische Outputs:**
-
-- Strukturierte JSON-Extraktion
-- Tabellen mit Units & Analysepopulation
-- Claim-Listen mit Red Flags
-
-**Beispiele:**
-
-- Studienparameter extrahieren
-- Text → Schema-Tabelle
-- Qualitätsdokumente auf Inkonsistenzen prüfen
-
----
-
-### B) Zusammenfassen & Konsolidieren
-
-**Typische Outputs:**
-
-- PICO-Struktur
-- Ergebnistabellen mit CI/p-Werten
-- Multi-Source-Konsolidierung
-- Konfliktlog (nicht wegformulieren, sondern dokumentieren)
-
-**Prinzip:**  
-Narrativ folgt Tabelle – nicht umgekehrt.
-
----
-
-### C) Prüfen & Bewerten (Advanced)
-
-**Typische Outputs:**
-
-- Rubrik-Scoring mit Evidenz
-- Requirement-Matrix (`Pass` / `Partial` / `Fail` / `Unknown`)
-- Gap-Analyse
-- Findings Log (objektiv formuliert, keine Urteile)
-
-**Bewertungsregel:**  
-Wenn Beleg fehlt → konservativ bewerten + „Beleg fehlt“ dokumentieren.
-
----
-
-## Auditierbare Output-Typen
-
-- Evidence-annotiertes JSON
-- Tabellen mit:
-  - Einheit
-  - Analysepopulation
-  - Zeitpunkt
-  - Fundstelle
-- Requirement-Traceability-Matrix
-- Konfliktprotokoll
-- Reviewer-Findings-Log
-
-Alle Outputs müssen so formuliert sein, dass ein Reviewer sie ohne KI nachvollziehen kann.
-
----
+------------------------------------------------------------------------
 
 ## Governance-Hinweis
 
-- KI ist Assistenz, nicht Entscheidungsinstanz.
-- Reviewer-Sign-off ist verpflichtend.
-- Automatisierte Zusammenfassungen benötigen Verifier-Step.
-- Keine regulatorische Freigabe ohne fachliche Prüfung.
-
----
-
-## Zielsetzung Workshop 2
-
-- Transfer von strukturiertem Prompting in wissenschaftliche Arbeitsprozesse  
-- Minimierung von Halluzinations- und Compliance-Risiken  
-- Aufbau reproduzierbarer, auditierbarer KI-Workflows  
-- Anwendung in Studium, Forschung und regulierten Industriekontexten  
+Alle generierten Inhalte sind fachlich zu prüfen.
+Regulatorische Freigaben erfolgen ausschließlich durch qualifizierte
+Fachstellen.
