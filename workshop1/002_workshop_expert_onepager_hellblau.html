@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workshop Expertenteil – One-Pager (R-Code & CustomGPT)</title>
+  <style>
+    :root {
+      --bg: #eef4ff;
+      --bg-soft: #f6f9ff;
+      --panel: #ffffff;
+      --panel-2: #f8fbff;
+      --text: #1f2a44;
+      --muted: #5f6f92;
+      --accent: #7ea7ff;
+      --border: #d6e3fb;
+      --border-strong: #bfd4f8;
+      --shadow: 0 10px 28px rgba(38, 71, 130, 0.08);
+      --radius: 18px;
+
+      --pastel-green: #eef9ef;
+      --pastel-green-border: #cfeacf;
+      --pastel-yellow: #fff9e8;
+      --pastel-yellow-border: #f2e4ae;
+      --pastel-blue: #eef6ff;
+      --pastel-blue-border: #cfe1fb;
+      --pastel-gray: #f2f4f7;
+      --pastel-gray-border: #d9dee7;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg) 0%, #eaf2ff 55%, #edf4ff 100%);
+      color: var(--text); line-height: 1.45;
+    }
+    .container { width:min(1220px, 94vw); margin:0 auto; padding:24px 0 80px; }
+    .hero {
+      background: radial-gradient(1000px 380px at 10% -10%, rgba(126,167,255,.22), transparent 60%), radial-gradient(700px 240px at 100% 0%, rgba(144,213,255,.22), transparent 55%), var(--panel);
+      border: 1px solid var(--border-strong); border-radius: 24px; padding: 22px; box-shadow: var(--shadow); position: sticky; top: 12px; z-index: 20; margin-bottom: 20px;
+    }
+    .hero h1 { margin:0 0 6px; font-size: clamp(1.2rem, 2vw, 1.8rem); color:#1d2b4d; }
+    .hero p { margin:0; color:var(--muted); }
+    .toolbar { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .btn { border:1px solid var(--border-strong); background:#f6f9ff; color:var(--text); padding:9px 12px; border-radius:12px; cursor:pointer; font-weight:600; font-size:.9rem; }
+    .btn:hover { background:#f1f6ff; border-color:#a8c2f5; }
+    .btn.primary { background: linear-gradient(180deg,#eef4ff,#e6efff); border-color:#a9c3f5; }
+    .btn.active { outline:2px solid rgba(126,167,255,.25); }
+
+    .grid { display:grid; grid-template-columns: 290px 1fr; gap:18px; align-items:start; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } .hero { position: static; } }
+
+    .sidebar, .panel { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
+    .sidebar { padding:12px; position:sticky; top:140px; max-height: calc(100vh - 160px); overflow:auto; }
+    @media (max-width: 980px) { .sidebar { position: static; max-height:none; } }
+
+    .nav-group { margin-bottom:12px; }
+    .nav-group h4 { margin:8px 6px; color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; }
+    .nav-link { display:block; width:100%; text-align:left; border:1px solid transparent; background:transparent; color:var(--text); padding:10px 10px; border-radius:10px; cursor:pointer; margin:3px 0; font-size:.92rem; }
+    .nav-link:hover { background:#f6f9ff; border-color:var(--border); }
+    .nav-link.active { background:#eef4ff; border-color:#bfd4f8; }
+
+    .content { display:flex; flex-direction:column; gap:16px; }
+    .panel { padding:18px; }
+    .section-title { margin:0 0 10px; font-size:1.15rem; color:#213154; }
+    .subtle { color:var(--muted); }
+    .mini-card { border:1px solid var(--border); border-radius:14px; background:var(--panel-2); padding:12px; }
+    .mini-card h4 { margin:0 0 8px; font-size:.95rem; color:#24365f; }
+    .mini-card p { margin:0; color:var(--muted); font-size:.9rem; }
+    .cols-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .cols-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    @media (max-width: 980px) { .cols-2, .cols-3 { grid-template-columns:1fr; } }
+
+    .callout { border:1px solid #cfe0fb; border-left:4px solid #7ea7ff; border-radius:12px; padding:12px; background:#f2f7ff; margin:10px 0; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:#f8fbff; color:#556786; font-size:.82rem; }
+    .legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .legend .chip { background:#fff; }
+    .sw { width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid #d5dbe6; }
+
+    table { width:100%; border-collapse:collapse; font-size:.9rem; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#fff; }
+    th, td { border-bottom:1px solid var(--border); padding:10px; text-align:left; vertical-align:top; }
+    th { background:#f5f9ff; color:#29406f; }
+    tr:last-child td { border-bottom:none; }
+    .badge { display:inline-block; border-radius:999px; padding:3px 8px; font-size:.75rem; border:1px solid var(--border); }
+    .badge.high { color:#2f7a44; border-color:#bfe4c8; background:#eef8f0; }
+    .badge.mid { color:#8c6a17; border-color:#eddba0; background:#fff9e7; }
+
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 12px; }
+    .tab-btn { border:1px solid var(--border); background:#f7faff; color:var(--text); border-radius:10px; padding:8px 10px; cursor:pointer; font-weight:600; font-size:.86rem; }
+    .tab-btn:hover { background:#f2f7ff; border-color:#bfd4f8; }
+    .tab-btn.active { background:#eaf2ff; border-color:#b8cef7; }
+
+    pre { margin:0; white-space:pre-wrap; word-wrap:break-word; background:#fff; border:1px solid var(--border); color:#253558; border-radius:12px; padding:12px; font-size:.85rem; line-height:1.42; max-height:380px; overflow:auto; }
+    code { background:#f1f5ff; border:1px solid #d6e3fb; padding:1px 5px; border-radius:6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.88em; }
+
+    .usecase-card { border:1px solid var(--border); border-radius:16px; background:#fff; padding:14px; box-shadow:0 4px 14px rgba(38,71,130,.04); margin-top:12px; }
+    .usecase-head { display:flex; gap:10px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
+    .usecase-head h3 { margin:0; font-size:1rem; color:#213154; }
+    .usecase-meta { color:var(--muted); font-size:.86rem; }
+    .hidden { display:none !important; }
+    .small { font-size:.85rem; color:var(--muted); }
+    .divider { height:1px; background:var(--border); margin:10px 0 14px; }
+    .list-tight { margin:8px 0; padding-left:18px; }
+    .list-tight li { margin:4px 0; }
+
+    .tab-panel[data-panel="prompt"] pre, .tab-panel[data-panel="prompt"] .mini-card { background:var(--pastel-green); border-color:var(--pastel-green-border); }
+    .tab-panel[data-panel="input"] pre, .tab-panel[data-panel="input"] .mini-card { background:var(--pastel-yellow); border-color:var(--pastel-yellow-border); }
+    .tab-panel[data-panel="output"] pre, .tab-panel[data-panel="output"] .mini-card { background:var(--pastel-blue); border-color:var(--pastel-blue-border); }
+    .tab-panel[data-panel="hint"] pre, .tab-panel[data-panel="hint"] .mini-card { background:var(--pastel-gray); border-color:var(--pastel-gray-border); }
+
+    .stepper { counter-reset: step; }
+    .step { display:grid; grid-template-columns:34px 1fr; gap:10px; margin:10px 0; }
+    .step::before { counter-increment: step; content: counter(step); width:30px; height:30px; border-radius:999px; display:grid; place-items:center; background:#edf4ff; border:1px solid #bfd4f8; font-weight:700; color:#2b4473; }
+
+    .file-list a { color:#2f5fbf; text-decoration:none; }
+    .file-list a:hover { text-decoration:underline; }
+    .file-list code { background:#fff; }
+    .note { font-size:.82rem; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <h1>Expertenteil One-Pager: R-Code-Generierung & CustomGPT-Weiterentwicklung</h1>
+      <p>Interaktive Advanced-Übersicht für den Workshop mit zwei Tracks: <strong>A) Code-Generierung in R</strong> und <strong>B) CustomGPT-Weiterentwicklung (Systemprompt, Datenanbindung, Guidelines-Parsing)</strong>.</p>
+      <div class="toolbar">
+        <button class="btn primary" onclick="showSection('sec-a')">Zu Track A (R)</button>
+        <button class="btn primary" onclick="showSection('sec-b')">Zu Track B (CustomGPT)</button>
+        <button class="btn" onclick="copyTextBlock('gpt-user-prompt-template')">User-Prompt-Vorlage kopieren</button>
+        <button class="btn" onclick="toggleCompactMode(this)">Kompaktmodus</button>
+      </div>
+      <div class="legend">
+        <span class="chip"><span class="sw" style="background:var(--pastel-green);"></span> Prompt-Vorlage</span>
+        <span class="chip"><span class="sw" style="background:var(--pastel-yellow);"></span> Beispiel-Input</span>
+        <span class="chip"><span class="sw" style="background:var(--pastel-blue);"></span> Beispiel-Output</span>
+        <span class="chip"><span class="sw" style="background:var(--pastel-gray);"></span> Praxis-Hinweis</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <aside class="sidebar">
+        <div class="nav-group">
+          <h4>Überblick</h4>
+          <button class="nav-link active" data-target="sec-overview">Start / Einordnung</button>
+          <button class="nav-link" data-target="sec-files">Dateien & lokale Links</button>
+        </div>
+        <div class="nav-group">
+          <h4>Track A</h4>
+          <button class="nav-link" data-target="sec-a">A) Code-Generierung in R</button>
+        </div>
+        <div class="nav-group">
+          <h4>Track B</h4>
+          <button class="nav-link" data-target="sec-b">B) CustomGPT-Weiterentwicklung</button>
+          <button class="nav-link" data-target="sec-b-setup">GPT-Erstellung (Schritt für Schritt)</button>
+          <button class="nav-link" data-target="sec-b-files">Knowledge-Dateien (Dummy-Fall)</button>
+          <button class="nav-link" data-target="sec-b-cases">Live-Demo-Fälle</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="sec-overview" class="panel section">
+          <h2 class="section-title">Expertenteil – Einordnung & Workshop-Logik</h2>
+          <p class="subtle">Dieser Teil richtet sich an fortgeschrittene Teilnehmende. Beide Tracks zeigen den Sprung von <em>gutem Prompting</em> zu <strong>Prompt-Architektur</strong> und reproduzierbaren Arbeitsabläufen.</p>
+          <div class="cols-2">
+            <div class="mini-card">
+              <h4>Track A: Code-Generierung in R</h4>
+              <p>Fokus auf Datenstruktur, Validierung, ausführbaren Code, Fehlerbehandlung und reproduzierbare Analyse-Skripte.</p>
+              <div class="chips">
+                <span class="chip"><span class="badge high">Advanced</span></span>
+                <span class="chip">Markdown + Code-Spezifikation</span>
+              </div>
+            </div>
+            <div class="mini-card">
+              <h4>Track B: CustomGPT-Weiterentwicklung</h4>
+              <p>Fokus auf Systemprompt, Knowledge-Dateien, Feldmapping, Guideline-Parsing, User-Prompts und Human-Review.</p>
+              <div class="chips">
+                <span class="chip"><span class="badge high">Advanced</span></span>
+                <span class="chip">Markdown + XML-/Schema-Denken</span>
+              </div>
+            </div>
+          </div>
+          <div class="callout"><strong>Didaktischer Kern:</strong> Nicht nur „einen Prompt schreiben“, sondern <strong>Teilaufgaben, Inputs, Regeln und Outputs modular designen</strong>.</div>
+        </section>
+
+        <section id="sec-files" class="panel section hidden">
+          <h2 class="section-title">Dateien & lokale Links (für den Expertenteil / CustomGPT-Setup)</h2>
+          <p class="subtle">Diese Links sind als <strong>lokale hrefs</strong> für Ihren Workshop-Ordner vorgesehen. Legen Sie HTML, MD/CSV-Dateien und das Icon in denselben Ordner (oder passen Sie die Pfade an).</p>
+          <div class="mini-card file-list">
+            <h4>Knowledge-Dateien (MD/CSV) + Icon</h4>
+            <ul class="list-tight">
+              <li><a href="01_Guideline_Auszug_Bezeichnungspruefung.md">01_Guideline_Auszug_Bezeichnungspruefung.md</a></li>
+              <li><a href="02_Pruefschema_Bezeichnungspruefung.md">02_Pruefschema_Bezeichnungspruefung.md</a></li>
+              <li><a href="03_Vorlage_Abschlussschreiben.md">03_Vorlage_Abschlussschreiben.md</a></li>
+              <li><a href="04_Begriffsdefinitionen_Glossar.md">04_Begriffsdefinitionen_Glossar.md</a></li>
+              <li><a href="05_Feldmapping_Export_Fallfelder.csv">05_Feldmapping_Export_Fallfelder.csv</a></li>
+              <li><a href="06_Beispiel_Pruefbericht_Referenz.md">06_Beispiel_Pruefbericht_Referenz.md</a></li>
+              <li><a href="Icon-GPT.png">Icon-GPT.png</a></li>
+            </ul>
+            <p class="note">Hinweis: Browser öffnen lokale <code>.md</code>-Dateien je nach Einstellung als Textansicht oder Download. Das ist für die Workshop-Demo ausreichend.</p>
+          </div>
+          <div class="callout"><strong>Empfehlung:</strong> Einen Projektordner anlegen, z. B. <code>Workshop_Expert_CustomGPT/</code> und alle Dateien dort zusammen ablegen.</div>
+        </section>
+
+        <section id="sec-a" class="panel section hidden">
+          <h2 class="section-title">A) Code-Generierung in R (Advanced Track)</h2>
+          <p class="subtle">Eigenständiger Track für Statistik-/Data-affine Teilnehmende. Fokus auf <strong>ausführbaren Code</strong>, <strong>Datenvalidierung</strong> und <strong>reproduzierbare Skriptstruktur</strong>.</p>
+          <div class="usecase-card">
+            <div class="usecase-head">
+              <div>
+                <h3>Use Case A – R-Code für deskriptiven Gruppenvergleich (Follow-up-Typen)</h3>
+                <div class="usecase-meta"><strong>Format:</strong> Markdown + Code-Spezifikation (Pakete, Datenstruktur, Regeln, Output)</div>
+              </div>
+              <div class="chips"><span class="chip">Warum top: Pair-Programming mit KI statt „Code-Würfeln“</span></div>
+            </div>
+            <p class="subtle" style="margin:8px 0 6px;">Die Vorlage zwingt zu sauberer Spezifikation: Pflichtspalten, Datentypen, erlaubte Pakete, Validierungslogik, Ausgabeformat und Risiken.</p>
+            <div class="callout"><strong>Struktur-Mehrwert:</strong> Der Code wird deutlich robuster, wenn Datenstruktur, Prüfregeln und gewünschte Ausgaben vorab strukturiert vorgegeben werden.</div>
+
+            <div class="tabs" data-tab-group="trackA">
+              <button class="tab-btn active" data-tab="prompt">1. Prompt-Vorlage</button>
+              <button class="tab-btn" data-tab="input">2. Beispiel-Input</button>
+              <button class="tab-btn" data-tab="output">3. Beispiel-Output</button>
+              <button class="tab-btn" data-tab="hint">4. Praxis-Hinweis</button>
+            </div>
+
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="prompt"><pre id="r-prompt-template"># Aufgabe
+Erstelle R-Code für die unten beschriebene statistische Aufgabe.
+
+## Ziel
+- Korrekt ausführbarer R-Code
+- Nachvollziehbar kommentiert
+- Reproduzierbar (klare Pakete, klare Schritte)
+- Robust gegenüber typischen Eingabefehlern (soweit sinnvoll)
+
+## Kontext
+- Zielgruppe: Statistikteam / Fachreferat
+- R-Umgebung: R 4.3.x
+- Erlaubte Pakete: dplyr, tidyr, ggplot2, readr
+- Nicht verwenden: exotische Pakete / Internetzugriffe
+- Datenquelle: CSV
+
+## Eingabedaten / Datenstruktur
+### Datenbeschreibung
+- Datensatzname: ae_data
+- Beobachtungseinheit: Fallmeldung
+- Relevante Variablen:
+  - patient_id (chr)
+  - center_id (chr)
+  - followup_type (factor: standard / extended)
+  - completeness_score (numeric)
+  - case_closure_days (numeric)
+  - relevant_detail_detected (0/1)
+  - report_date (Date)
+
+### Qualitätsregeln / Annahmen
+- Fehlende Werte behandeln: in Berechnungen mit na.rm = TRUE, aber pro Gruppe ausweisen
+- Gruppierungslogik: followup_type
+
+## Aufgabe im Detail
+1. Daten validieren (Pflichtspalten prüfen)
+2. Deskriptive Statistik nach followup_type berechnen
+3. Vergleich der Gruppen:
+   - relevant_detail_detected (Anteile)
+   - completeness_score (Mittelwert/Median)
+   - case_closure_days (Median)
+4. Ergebnis-Tabelle erstellen
+5. Optional: einfache Visualisierung (ggplot2)
+6. Kurze Interpretation als Kommentar im Skript (keine medizinische Schlussfolgerung)
+
+## Ausgabeformat
+### A) R-Code
+- Vollständiges Skript in einem Block
+- Mit Kommentaren je Abschnitt
+
+### B) Kurze Erläuterung (max. 8 Bullet Points)
+### C) Prüfpunkte / Risiken
+
+## Regeln
+- Wenn Angaben fehlen, sinnvolle Annahme treffen und explizit markieren
+- Kein Pseudocode, sondern ausführbarer R-Code
+- Keine erfundenen Variablennamen außerhalb der beschriebenen Struktur
+- Statistik nicht überinterpretieren
+
+## Input
+&lt;&lt;&lt;ANFORDERUNG&gt;&gt;&gt;
+[Beschreibung der Analyseaufgabe]
+&lt;&lt;&lt;END&gt;&gt;&gt;
+
+&lt;&lt;&lt;BEISPIELDATEN_ODER_SCHEMA&gt;&gt;&gt;
+[Optional: Schema/Beispieldaten]
+&lt;&lt;&lt;END&gt;&gt;&gt;</pre><div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('r-prompt-template')">Prompt kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="input"><pre id="r-example-input">ANFORDERUNG:
+Wir möchten einen ersten Vergleich zwischen standard und extended follow-up durchführen.
+Bitte erstelle ein R-Skript, das:
+- eine CSV-Datei "ae_followup.csv" einliest,
+- Pflichtspalten prüft,
+- pro followup_type die Anzahl Fälle, Anteil relevant_detail_detected,
+  Mittelwert und Median completeness_score sowie Median case_closure_days berechnet,
+- eine übersichtliche Ergebnistabelle erzeugt,
+- optional ein Balkendiagramm für den Anteil relevant_detail_detected erstellt.
+
+Zusätzlich bitte fehlende Werte in den jeweiligen Berechnungen sauber behandeln (na.rm = TRUE, aber Anzahl fehlender Werte pro Gruppe ausweisen).
+
+BEISPIELDATEN_ODER_SCHEMA:
+CSV mit Spalten:
+patient_id, center_id, followup_type, completeness_score, case_closure_days, relevant_detail_detected, report_date</pre><div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('r-example-input')">Beispiel-Input kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="output"><pre id="r-example-output"># Pakete laden
+library(dplyr)
+library(readr)
+library(ggplot2)
+
+# 1) Daten einlesen
+ae_data &lt;- read_csv("ae_followup.csv", show_col_types = FALSE)
+
+# 2) Pflichtspalten prüfen
+required_cols &lt;- c(
+  "patient_id", "center_id", "followup_type",
+  "completeness_score", "case_closure_days",
+  "relevant_detail_detected", "report_date"
+)
+missing_cols &lt;- setdiff(required_cols, names(ae_data))
+if (length(missing_cols) &gt; 0) {
+  stop(paste("Fehlende Pflichtspalten:", paste(missing_cols, collapse = ", ")))
+}
+
+# 3) Basisvalidierung
+ae_data &lt;- ae_data %&gt;%
+  mutate(
+    followup_type = as.factor(followup_type),
+    relevant_detail_detected = as.numeric(relevant_detail_detected)
+  )
+# Rückfragepunkt: Prüfen, ob relevant_detail_detected ausschließlich 0/1 enthält.
+
+# 4) Gruppenstatistik
+summary_table &lt;- ae_data %&gt;%
+  group_by(followup_type) %&gt;%
+  summarise(
+    n_cases = n(),
+    n_missing_completeness = sum(is.na(completeness_score)),
+    n_missing_closure_days = sum(is.na(case_closure_days)),
+    n_missing_relevant_detail = sum(is.na(relevant_detail_detected)),
+    prop_relevant_detail = mean(relevant_detail_detected == 1, na.rm = TRUE),
+    mean_completeness = mean(completeness_score, na.rm = TRUE),
+    median_completeness = median(completeness_score, na.rm = TRUE),
+    median_case_closure_days = median(case_closure_days, na.rm = TRUE),
+    .groups = "drop"
+  )
+print(summary_table)
+
+# 5) Optionale Visualisierung
+ggplot(summary_table, aes(x = followup_type, y = prop_relevant_detail)) +
+  geom_col() +
+  labs(title = "Anteil klinisch relevanter Details nach Follow-up-Typ", x = "Follow-up-Typ", y = "Anteil (0-1)") +
+  theme_minimal()
+
+# 6) Interpretation (technisch)
+# Deskriptive Gegenüberstellung; inferenzstatistische Aussagen erfordern weitere Tests/Modelle und fachliche Prüfung.</pre>
+                <div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('r-example-output')">Beispiel-Output kopieren</button></div>
+                <div class="mini-card" style="margin-top:10px;"><h4>Kurze Erläuterung / Prüfpunkte (gekürzt)</h4><ul class="list-tight"><li>CSV wird eingelesen und Pflichtspalten geprüft.</li><li>Fehlende Werte werden je Variable pro Gruppe ausgewiesen.</li><li>Ergebnis ist deskriptiv – keine inferenzstatistische Schlussfolgerung.</li><li>Prüfrisiken: 0/1-Codierung, Schreibvarianten in <code>followup_type</code>, Ausreißer, Dubletten.</li></ul></div></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Für R-Code-Prompts immer zuerst <em>Datenstruktur + Pflichtspalten + erlaubte Pakete + Validierungsregeln</em> definieren. Dann wird die KI zum verlässlicheren Pair-Programmer.</p><p class="small" style="margin-top:8px;">Didaktischer Tipp: Zeigen Sie im Workshop einen schlechten Prompt („Schreib mir R-Code für einen Vergleich“) und direkt danach die strukturierte Version.</p></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-b" class="panel section hidden">
+          <h2 class="section-title">B) CustomGPT-Weiterentwicklung (Pilotprojekt)</h2>
+          <p class="subtle">Fokus: <strong>Systemprompt, Datenanbindung, Guidelines-Parsing</strong> – plus Live-Betrieb mit strukturiertem User-Prompt und Dummy-Fällen. Ziel-Fähigkeit: <strong>„Prüfung von Arzneimittelbezeichnungen“</strong>.</p>
+          <div class="cols-2">
+            <div class="mini-card"><h4>Was gezeigt wird</h4><ul class="list-tight"><li>Wie ein CustomGPT im Web angelegt wird</li><li>Wo Instructions/Systemprompt eingebaut werden</li><li>Wie Knowledge-Dateien genutzt werden</li><li>Wie Teilnehmende das GPT mit User-Prompt-Vorlagen benutzen</li></ul></div>
+            <div class="mini-card"><h4>Wichtige Botschaft</h4><p>Ein gutes CustomGPT entsteht nicht aus einem einzelnen Mega-Prompt, sondern aus einer <strong>Prompt-Architektur</strong>: Instructions + Knowledge + strukturierter Fall-Input + Human Review.</p></div>
+          </div>
+          <div class="callout"><strong>Sicherheitsprinzip:</strong> Das GPT unterstützt die <strong>Vorprüfung</strong> und Entwurfsformulierung – es trifft <strong>keine finale regulatorische/rechtliche Entscheidung</strong>.</div>
+
+          <div class="usecase-card">
+            <div class="usecase-head">
+              <div>
+                <h3>Use Case B – CustomGPT „Prüfung von Arzneimittelbezeichnungen“ (Weiterentwicklung)</h3>
+                <div class="usecase-meta"><strong>Format:</strong> Markdown/XML-orientierte Prompt-Architektur + Knowledge-Dateien + strukturierte User-Prompts</div>
+              </div>
+              <div class="chips"><span class="chip">Warum top: Zeigt Systemebene + Fallbacks + Auditierbarkeit</span></div>
+            </div>
+            <p class="subtle" style="margin:8px 0 6px;">Für das Pilotprojekt werden textliche, technische und guideline-basierte Komponenten modular entworfen.</p>
+            <div class="callout"><strong>Struktur-Mehrwert:</strong> Trennung von <em>Systemprompt-Logik</em>, <em>Datenlogik</em>, <em>Guideline-Regellogik</em> und <em>Textausgabe</em> macht das System wartbar und nachvollziehbar.</div>
+
+            <div class="tabs" data-tab-group="trackB">
+              <button class="tab-btn active" data-tab="prompt">1. Prompt-Vorlage</button>
+              <button class="tab-btn" data-tab="input">2. Beispiel-Input</button>
+              <button class="tab-btn" data-tab="output">3. Beispiel-Output</button>
+              <button class="tab-btn" data-tab="hint">4. Praxis-Hinweis</button>
+            </div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="prompt"><pre id="customgpt-arch-prompt"># Aufgabe
+Entwickle einen strukturierten Entwurf zur Weiterentwicklung eines bestehenden CustomGPT für die Prüfung von Arzneimittelbezeichnungen.
+
+## Ziel
+- Systemprompt modular verbessern
+- Datenanbindung (z. B. Exporte) sinnvoll integrieren
+- Guidelines-/Regeltexte strukturiert auslesbar machen
+- Risiken, Grenzen und Human-Review-Punkte klar benennen
+
+## Projektkontext
+- Bestehendes System: CustomGPT zur Prüfung von Arzneimittelbezeichnungen
+- Ziel der Weiterentwicklung:
+  1) textliche Optimierung (amtliche Abschlussschreiben)
+  2) technische Optimierung (Datenbank-/Export-Einbindung)
+  3) wissenschaftlich/regulatorische Optimierung (Guidelines auslesen/anwenden)
+
+## Aufgabenpakete (getrennt bearbeiten)
+1. Systemprompt-Architektur
+2. Datenanbindung / Datenfluss
+3. Guidelines-Parsing / Regelanwendung
+4. Ausgabe-Templates (z. B. Abschlussschreiben)
+5. Qualitäts- und Freigabeprozess
+6. Risiken / Grenzen / Eskalationsregeln
+
+## Ausgabeformat
+### A) Zielbild (max. 150 Wörter)
+### B) Vorschlag Systemprompt (modular)
+### C) Datenanbindung (Tabelle)
+### D) Guidelines-Parsing-Konzept
+### E) Prompt-Template für 1 Prüfprozess
+### F) Beispiel-Output des Systems (gekürzt)
+### G) Qualitäts- und Freigabeprozess
+
+## Regeln
+- Keine technische Implementierung erfinden, die nicht im Input genannt ist
+- Annahmen explizit markieren
+- Trenne klar zwischen Systemprompt-Logik, Datenlogik, Regellogik und Textausgabe
+- Berücksichtige Nachvollziehbarkeit und Auditierbarkeit
+- Human Review als Pflichtschritt definieren
+
+## Input
+&lt;&lt;&lt;PILOTPROJEKT_BESCHREIBUNG&gt;&gt;&gt;
+[Beschreibung]
+&lt;&lt;&lt;END&gt;&gt;&gt;
+
+&lt;&lt;&lt;BEISPIEL_EXPORT_ODER_FELDER&gt;&gt;&gt;
+[Optional]
+&lt;&lt;&lt;END&gt;&gt;&gt;
+
+&lt;&lt;&lt;GUIDELINE_AUSZUG&gt;&gt;&gt;
+[Optional]
+&lt;&lt;&lt;END&gt;&gt;&gt;</pre><div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('customgpt-arch-prompt')">Prompt kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="input"><pre id="customgpt-example-input">PILOTPROJEKT_BESCHREIBUNG:
+Es existiert ein CustomGPT zur Prüfung von Arzneimittelbezeichnungen. Aktuell kann das System Nutzertexte analysieren und Hinweise geben, ist aber in der Begründungstiefe uneinheitlich.
+Gewünscht:
+- standardisierter Prüfbericht
+- Entwurf eines amtlichen Abschlussschreibens
+- Einbindung strukturierter Daten aus Exporten (z. B. Antrag-ID, Produktname, Wirkstoff, Verfahrensart)
+- Nutzung von Guideline-Auszügen zur regelbasierten Begründung
+- klare Kennzeichnung von Unsicherheit und Pflicht zur manuellen Endprüfung
+
+BEISPIEL_EXPORT_ODER_FELDER:
+antrag_id, produktname, wirkstoff, verfahrensart, antragsteller, eingangsdatum, status, bearbeiter, sprachversion
+
+GUIDELINE_AUSZUG:
+- Bezeichnungen dürfen nicht irreführend sein.
+- Verwechslungsgefahr mit bestehenden Bezeichnungen ist zu prüfen.
+- Fachliche Begründungen sind nachvollziehbar zu dokumentieren.
+- Entscheidungsschreiben müssen die wesentlichen Gründe enthalten.</pre><div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('customgpt-example-input')">Beispiel-Input kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="output"><pre id="customgpt-example-output">A) Zielbild (gekürzt)
+Das weiterentwickelte CustomGPT unterstützt die strukturierte Vorprüfung von Arzneimittelbezeichnungen, erstellt nachvollziehbare Prüfberichte und Entwürfe für amtliche Abschlussschreiben auf Basis von Falldaten und Guideline-Auszügen. Es trifft keine finale Entscheidung.
+
+B) Vorschlag Systemprompt (modular, gekürzt)
+- Rolle: Assistenzdienst für Vorprüfung (keine finale Entscheidung)
+- Kernaufgaben: Vollständigkeitsprüfung, Regelabgleich, Prüfbericht, optional Abschlussschreiben
+- Regeln: nur bereitgestellte Daten/Regeln; Unsicherheiten markieren; Human Review Pflicht
+- Ausgabe: Prüfbericht + offene Punkte + optionaler Entwurf
+
+C) Datenanbindung (Beispiel)
+| Bereich | Beschreibung | Beispiel | Risiko / Prüfpunkte |
+|---|---|---|---|
+| Datenquelle | CSV-/DB-Export | antrag_id, produktname, wirkstoff | Feldnamen ändern sich je Exportversion |
+| Feldmapping | Exportfelder zu Promptfeldern | produktname -> beantragte_bezeichnung | Mapping versionieren |
+| Validierung | Pflichtfelder prüfen | antrag_id, produktname, verfahrensart | leere Felder / falsche Formate |
+
+D) Guidelines-Parsing-Konzept (gekürzt)
+- Regel-Extraktion als strukturierte Einträge (Regel-ID, Text, Kategorie, Quelle, Version)
+- Soll-Ist-Abgleich im Prüfbericht mit Regelbezug oder „nicht belegt“
+
+E) Prompt-Template für 1 Prüfprozess
+(inkl. Falldaten-Block + Guidelines-Block + Verbot finaler Entscheidungen)
+
+G) Qualitäts- und Freigabeprozess
+- KI: Strukturierung, Regelzuordnung, Entwurfsformulierung
+- Mensch: fachliche/regulatorische Entscheidung und Endfreigabe</pre>
+                <div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('customgpt-example-output')">Beispiel-Output kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Nicht alles in einen Mega-Prompt packen. Besser modular denken: <strong>Instructions</strong> (Verhalten), <strong>Knowledge</strong> (Fachgrundlage), <strong>User-Prompt</strong> (konkreter Fall), <strong>Output-Template</strong> (Ergebnisstruktur).</p><p class="small" style="margin-top:8px;">Das ist der Schritt von „gutem Prompting“ zu „professionellem KI-Arbeitsdesign“.</p></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-b-setup" class="panel section hidden">
+          <h2 class="section-title">CustomGPT-Erstellung im Web – Schritt für Schritt (Workshop-Demo)</h2>
+          <p class="subtle">Hier wird erklärt, <strong>wie</strong> das GPT angelegt, wo die Prompts eingebaut und wie es anschließend benutzt wird. Die Teilnehmenden sollen strukturiertes Prompting auf System- und Fallebene sehen.</p>
+          <div class="callout"><strong>Wichtig:</strong> Das GPT wird im Web-Builder erstellt. <strong>Instructions</strong> = Systemprompt im GPT, <strong>User-Prompt</strong> = Fallprompt im Chat mit dem GPT.</div>
+
+          <div class="stepper">
+            <div class="step"><div><strong>GPT im Web anlegen</strong><p class="subtle">Neues GPT erstellen, Namen vergeben: <em>„Prüfung von Arzneimittelbezeichnungen (Vorprüfung)“</em>, Beschreibung eintragen, dann in <strong>Configure</strong> wechseln.</p></div></div>
+            <div class="step"><div><strong>Instructions/Systemprompt einfügen</strong><p class="subtle">Hier kommt die dauerhafte Logik hinein: Rolle, Aufgaben, Regeln, Ausgabeformate, Unsicherheits- und Human-Review-Regeln.</p></div></div>
+            <div class="step"><div><strong>Knowledge-Dateien hochladen</strong><p class="subtle">Guideline-Auszug, Prüfschema, Abschlussschreiben-Vorlage, Glossar, Feldmapping (CSV), Referenz-Prüfbericht. Diese Dateien liefern Fachbasis und Muster.</p></div></div>
+            <div class="step"><div><strong>Prompt Starters definieren</strong><p class="subtle">Beispiel-Starter für: Vollständigkeitsprüfung, Vorprüfung mit Prüfbericht, Vorprüfung + Abschlussschreiben-Entwurf.</p></div></div>
+            <div class="step"><div><strong>Capabilities bewusst wählen</strong><p class="subtle">Für den Workshop minimalistisch starten (stabiler): kein unnötiges Web/Extras, Fokus auf Struktur und Dummy-Fallmaterial.</p></div></div>
+            <div class="step"><div><strong>GPT testen mit strukturiertem User-Prompt</strong><p class="subtle">Teilnehmende nutzen die Fall-Vorlage mit Delimitern (<code>&lt;&lt;&lt;FALLDATEN&gt;&gt;&gt;</code>, optional <code>&lt;&lt;&lt;GUIDELINES&gt;&gt;&gt;</code>).</p></div></div>
+            <div class="step"><div><strong>Iteration zeigen</strong><p class="subtle">Nur einen Punkt ändern (z. B. Ausgabeformat oder Unsicherheitsregeln) und Ergebnis vergleichen.</p></div></div>
+          </div>
+
+          <div class="mini-card">
+            <h4>Copy/Paste – User-Prompt-Vorlage für Teilnehmende (Live-Betrieb)</h4>
+            <pre id="gpt-user-prompt-template"># Aufgabe
+Führe eine strukturierte Vorprüfung einer Arzneimittelbezeichnung durch.
+
+## Ziel
+- Prüfbericht mit nachvollziehbarer Begründung
+- Kennzeichnung von Unsicherheiten / offenen Punkten
+- optional: Entwurf eines amtlichen Abschlussschreibens
+
+## Gewünschte Ausgabe
+- Standardformat A (strukturierter Prüfbericht)
+- Zusätzlich: [ja/nein] Entwurf Abschlussschreiben
+
+## Regeln
+- Keine finale Entscheidung treffen
+- Nur bereitgestellte Informationen verwenden
+- Fehlende Angaben explizit markieren
+
+## Falldaten
+&lt;&lt;&lt;FALLDATEN&gt;&gt;&gt;
+antrag_id: [einfügen]
+produktname: [einfügen]
+wirkstoff: [einfügen]
+verfahrensart: [einfügen]
+antragsteller: [einfügen]
+sprachversion: [einfügen]
+weitere_hinweise: [optional]
+&lt;&lt;&lt;END&gt;&gt;&gt;
+
+## Zusätzliche Prüfkriterien / Guideline-Auszug (optional)
+&lt;&lt;&lt;GUIDELINES&gt;&gt;&gt;
+[optional einfügen]
+&lt;&lt;&lt;END&gt;&gt;&gt;</pre>
+            <div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('gpt-user-prompt-template')">User-Prompt-Vorlage kopieren</button></div>
+          </div>
+        </section>
+
+        $1
+
+          <div class="usecase-card">
+            <div class="usecase-head"><div><h3>01_Guideline_Auszug_Bezeichnungspruefung.md</h3><div class="usecase-meta">Zweck: kompakter Regelkatalog / Guideline-Auszug für die Vorprüfung</div></div><a class="btn" href="01_Guideline_Auszug_Bezeichnungspruefung.md">Datei öffnen</a></div>
+            <div class="tabs" data-tab-group="guideline01"><button class="tab-btn active" data-tab="output">Beispielinhalt (gekürzt)</button><button class="tab-btn" data-tab="hint">Praxis-Hinweis</button></div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="output"><pre id="guideline01-sample"># Guideline-Auszug: Prüfung von Arzneimittelbezeichnungen (Workshop-Demo)
+
+## Ziel
+Dieser Auszug dient als Demonstrationsmaterial für eine strukturierte Vorprüfung.
+
+## Regeln (Beispiel)
+### R1 – Irreführung vermeiden
+Bezeichnungen dürfen nicht irreführend sein.
+
+### R2 – Verwechslungsgefahr prüfen
+Eine mögliche Verwechslungsgefahr mit bestehenden Bezeichnungen ist zu prüfen.
+
+### R3 – Nachvollziehbare Begründung
+Fachliche Begründungen sind nachvollziehbar zu dokumentieren.
+
+### R4 – Wesentliche Gründe im Entscheidungsschreiben
+Entscheidungsschreiben sollen die wesentlichen Gründe enthalten.
+
+## Hinweis
+Dieser Auszug ist ein Workshop-Beispiel und ersetzt keine vollständige Guideline.</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Ein kompakter Guideline-Auszug ist ideal für die Demo, weil Regelbezüge (R1–R4) im Prüfbericht sichtbar werden, ohne die Teilnehmenden mit Volltexten zu überladen.</p></div></div>
+            </div>
+          </div>
+
+          <div class="usecase-card">
+            <div class="usecase-head"><div><h3>02_Pruefschema_Bezeichnungspruefung.md</h3><div class="usecase-meta">Zweck: interner Prüfprozess / Prüfschritte / Pflichtfelder für die Vorprüfung</div></div><a class="btn" href="02_Pruefschema_Bezeichnungspruefung.md">Datei öffnen</a></div>
+            <div class="tabs" data-tab-group="pruefschema02"><button class="tab-btn active" data-tab="output">Beispielinhalt (gekürzt)</button><button class="tab-btn" data-tab="hint">Praxis-Hinweis</button></div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="output"><pre id="pruefschema02-sample"># Prüfschema (Workshop-Demo)
+
+## Prüfschritte
+1. Falldaten auf Vollständigkeit prüfen
+2. Produktname und Kontext erfassen
+3. Relevante Regeln identifizieren
+4. Vorprüfung mit Begründung durchführen
+5. Unsicherheiten / offene Punkte dokumentieren
+6. Optional: Entwurf Abschlussschreiben erstellen
+
+## Pflichtfelder (mindestens)
+- Antrag-ID
+- Produktname
+- Wirkstoff
+- Verfahrensart
+- Antragsteller
+- Sprachversion</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Das Prüfschema verbindet Fachprozess und Prompt-Design. Es hilft dem GPT, die Arbeitsschritte in der richtigen Reihenfolge auszuführen (Vollständigkeit → Regelabgleich → Bericht → Entwurf).</p></div></div>
+            </div>
+          </div>
+
+          <div class="usecase-card">
+            <div class="usecase-head"><div><h3>03_Vorlage_Abschlussschreiben.md</h3><div class="usecase-meta">Zweck: Referenzstruktur und Stilvorgaben für den Entwurf amtlicher Abschlussschreiben</div></div><a class="btn" href="03_Vorlage_Abschlussschreiben.md">Datei öffnen</a></div>
+            <div class="tabs" data-tab-group="vorlage03"><button class="tab-btn active" data-tab="output">Beispielinhalt (gekürzt)</button><button class="tab-btn" data-tab="hint">Praxis-Hinweis</button></div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="output"><pre id="vorlage03-sample"># Vorlage Abschlussschreiben (Entwurf)
+
+## Struktur
+1. Betreff
+2. Bezug / Antrag
+3. Ergebnisdarstellung (als Entwurf)
+4. Begründung (wesentliche Gründe)
+5. Hinweise / offene Punkte
+6. Schlussformel
+
+## Stil
+- neutral
+- formal
+- nachvollziehbar
+- keine finale Rechtsentscheidung simulieren</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Diese Datei wirkt als Stil- und Strukturanker für Entwürfe. Das GPT erzeugt dadurch konsistentere Schreiben und markiert sie sauber als Entwurf.</p></div></div>
+            </div>
+          </div>
+
+          <div class="usecase-card">
+            <div class="usecase-head"><div><h3>04_Begriffsdefinitionen_Glossar.md</h3><div class="usecase-meta">Zweck: einheitliche Begriffe, Formulierungen und Abgrenzungen im Prüfprozess</div></div><a class="btn" href="04_Begriffsdefinitionen_Glossar.md">Datei öffnen</a></div>
+            <div class="tabs" data-tab-group="glossar"><button class="tab-btn active" data-tab="output">Beispielinhalt (gekürzt)</button><button class="tab-btn" data-tab="hint">Praxis-Hinweis</button></div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="output"><pre id="glossar-sample"># Begriffsdefinitionen / Glossar (Workshop-Demo)
+
+## Abschlussschreiben (Entwurf)
+Ein formaler Textentwurf zur Mitteilung eines Prüfergebnisses oder Zwischenstands.
+Im Demo-System immer als Entwurf – keine finale Freigabe.
+
+## Befund
+Strukturierte Feststellung im Rahmen der Vorprüfung (z. B. „vorhanden“, „unklar“, „nicht belegt“).
+Keine finale Entscheidung.
+
+## Human Review / manuelle Fachprüfung
+Verpflichtende fachliche Prüfung durch qualifiziertes Personal vor finaler Bewertung oder Freigabe.
+
+## Verwechslungsgefahr (Demo-Begriff)
+Hinweis auf mögliche Ähnlichkeit/Verwechselbarkeit mit anderen Bezeichnungen.
+Belastbare Bewertung kann zusätzliche Referenzdaten erfordern.</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Ein Glossar stabilisiert Tonalität und Begriffsnutzung im GPT. Das reduziert uneinheitliche Formulierungen in Prüfbericht und Schreiben.</p></div></div>
+            </div>
+          </div>
+
+          <div class="usecase-card">
+            <div class="usecase-head"><div><h3>05_Feldmapping_Export_Fallfelder.csv</h3><div class="usecase-meta">Zweck: Exportfelder → Prompt-/Prüfbericht-Felder sauber abbilden</div></div><a class="btn" href="05_Feldmapping_Export_Fallfelder.csv">CSV öffnen</a></div>
+            <div class="tabs" data-tab-group="mapping"><button class="tab-btn active" data-tab="output">Beispielinhalt (gekürzt)</button><button class="tab-btn" data-tab="hint">Praxis-Hinweis</button></div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="output"><pre id="mapping-sample">export_feldname,prompt_feldname,pruefbericht_feldname,datentyp,pflichtfeld,beispielwert,beschreibung,validierungsregel,häufige_probleme,human_review_hinweis
+antrag_id,antrag_id,Antrag-ID,string,ja,A-2026-0142,Eindeutige Kennung des Antrags,Leerwert nicht zulassen; Format prüfen,fehlend; uneinheitliches Format,Bei fehlender Antrag-ID nur eingeschränkte Vorprüfung
+produktname,produktname,Produktname,string,ja,Cardiolenta,Zu prüfende Bezeichnung,Leerwert nicht zulassen; Trim anwenden,Leerwert; Sonderzeichenfehler,Produktname manuell auf Schreibweise prüfen
+wirkstoff,wirkstoff,Wirkstoff,string,ja,Beispielwirkstoff A,Angabe zum Wirkstoffbezug,Leerwert markieren,fehlend; Abkürzungen,Fehlender Wirkstoff schränkt Aussagekraft ein</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> CSV-Mapping zeigt den technischen Teil von strukturiertem Prompting: Datenquellen, Felder, Validierungsregeln und typische Fehler werden explizit gemacht.</p></div></div>
+            </div>
+          </div>
+
+          <div class="usecase-card">
+            <div class="usecase-head"><div><h3>06_Beispiel_Pruefbericht_Referenz.md</h3><div class="usecase-meta">Zweck: Referenzausgabe / Zielmuster für Struktur und Tonalität</div></div><a class="btn" href="06_Beispiel_Pruefbericht_Referenz.md">Datei öffnen</a></div>
+            <div class="tabs" data-tab-group="reportref"><button class="tab-btn active" data-tab="output">Beispielinhalt (gekürzt)</button><button class="tab-btn" data-tab="hint">Praxis-Hinweis</button></div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="output"><pre id="reportref-sample">## 1. Fallüberblick
+- Antrag-ID: A-2026-0142
+- Produktname: Cardiolenta
+- Wirkstoff: Beispielwirkstoff A
+- Verfahrensart: national
+- Datenlage: teilweise vollständig
+
+## 2. Vollständigkeitsprüfung
+| Feld | Status | Hinweis |
+|---|---|---|
+| Antrag-ID | vorhanden | Format plausibel |
+| Vergleichsdaten zu bestehenden Bezeichnungen | fehlt | Für Verwechslungsgefahr relevant |
+
+## 3. Prüfkriterien mit Befund
+| Kriterium / Regel | Befund | Evidenz | Regelbezug | Unsicherheit |
+|---|---|---|---|---|
+| Verwechslungsgefahr prüfen | nicht abschließend prüfbar | keine Vergleichsdaten | R2 | Datenbankabgleich erforderlich |
+
+## 4. Kurzfazit (Vorprüfung)
+... eingeschränkt belastbar ...
+
+## 6. Hinweis zur finalen Prüfung
+Diese Ausgabe ist eine Vorprüfung und ersetzt keine finale fachliche oder regulatorische Entscheidung.</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Eine Referenz-Ausgabe hilft dem GPT (und den Nutzenden), das gewünschte Ergebnisformat konstant zu halten. Das wirkt wie ein Qualitätsanker.</p></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-b-cases" class="panel section hidden">
+          <h2 class="section-title">Live-Demo-Fälle (Dummy-Fall) – Nutzung im Workshop</h2>
+          <p class="subtle">Hier zeigen Sie den Unterschied zwischen einem vollständigen und einem unvollständigen Fall. Beide Fälle nutzen denselben strukturierten User-Prompt-Aufbau.</p>
+
+          <div class="usecase-card">
+            <div class="usecase-head">
+              <div>
+                <h3>Demo-Fall 1 (guter Fall) – Vorprüfung + Entwurf Abschlussschreiben</h3>
+                <div class="usecase-meta">Didaktik: sauberes Ergebnis mit Regelbezügen, Unsicherheiten und formalem Entwurf</div>
+              </div>
+            </div>
+            <div class="tabs" data-tab-group="case1">
+              <button class="tab-btn active" data-tab="prompt">1. Prompt-Vorlage (eingesetzt)</button>
+              <button class="tab-btn" data-tab="input">2. Beispiel-Input</button>
+              <button class="tab-btn" data-tab="output">3. Beispiel-Output</button>
+              <button class="tab-btn" data-tab="hint">4. Praxis-Hinweis</button>
+            </div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="prompt"><pre id="case1-prompt"># Aufgabe
+Führe eine strukturierte Vorprüfung einer Arzneimittelbezeichnung durch.
+
+## Ziel
+- Prüfbericht mit nachvollziehbarer Begründung
+- Unsicherheiten / offene Punkte markieren
+- Zusätzlich: Entwurf eines amtlichen Abschlussschreibens (ja)
+
+## Regeln
+- Keine finale Entscheidung treffen
+- Nur bereitgestellte Informationen verwenden
+- Fehlende Angaben explizit markieren
+
+## Falldaten
+&lt;&lt;&lt;FALLDATEN&gt;&gt;&gt;
+antrag_id: A-2026-0142
+produktname: Cardiolenta
+wirkstoff: Beispielwirkstoff A
+verfahrensart: national
+antragsteller: Beispiel Pharma GmbH
+sprachversion: de
+weitere_hinweise: Antrag auf neue Bezeichnung im laufenden Verfahren.
+&lt;&lt;&lt;END&gt;&gt;&gt;
+
+## Zusätzliche Prüfkriterien / Guideline-Auszug
+&lt;&lt;&lt;GUIDELINES&gt;&gt;&gt;
+R1: Bezeichnungen dürfen nicht irreführend sein.
+R2: Verwechslungsgefahr mit bestehenden Bezeichnungen ist zu prüfen.
+R3: Fachliche Begründungen sind nachvollziehbar zu dokumentieren.
+R4: Entscheidungsschreiben sollen die wesentlichen Gründe enthalten.
+&lt;&lt;&lt;END&gt;&gt;&gt;</pre><div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('case1-prompt')">Fall 1 Prompt kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="input"><pre id="case1-input">Aufgabe
+Führe eine strukturierte Vorprüfung einer Arzneimittelbezeichnung durch.
+
+Ziel
+- Prüfbericht mit nachvollziehbarer Begründung
+- Unsicherheiten / offene Punkte markieren
+- Zusätzlich: Entwurf eines amtlichen Abschlussschreibens (ja)
+
+
+Falldaten
+
+
+verfahrensart: national
+antragsteller: Beispiel Pharma GmbH
+sprachversion: de
+weitere_hinweise: Antrag auf neue Bezeichnung im laufenden Verfahren.
+
+antrag_id: A-2026-0142
+produktname: Cardiolenta
+wirkstoff: Beispielwirkstoff A
+
+
+Zusätzliche Prüfkriterien / Guideline-Auszug
+
+Bezeichnungen dürfen nicht irreführend sein.
+Verwechslungsgefahr mit bestehenden Bezeichnungen ist zu prüfen.
+Fachliche Begründungen sind nachvollziehbar zu dokumentieren.
+Entscheidungsschreiben sollen die wesentlichen Gründe enthalten.
+
+Regeln
+- Keine finale Entscheidung treffen
+- Nur bereitgestellte Informationen verwenden
+- Fehlende Angaben explizit markieren</pre></div>
+              <div class="tab-panel hidden" data-panel="output"><pre id="case1-output">Erwartete Richtung (gekürzt):
+1) Fallüberblick (Antrag-ID, Produktname, Wirkstoff, Verfahrensart, Antragsteller, Sprachversion, Datenlage)
+2) Vollständigkeitsprüfung (Tabelle)
+3) Prüfkriterien mit Befund (inkl. R1-R4, Evidenz, Unsicherheit)
+4) Kurzfazit (Vorprüfung, eingeschränkte Belastbarkeit falls Verwechslungsdaten fehlen)
+5) Offene Punkte für manuelle Fachprüfung
+6) Hinweis auf finale Fachprüfung
++ optional Entwurf Abschlussschreiben (neutral-formal, als Entwurf gekennzeichnet)</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Nutzen Sie Fall 1, um zu zeigen, wie Structured Prompting + Systemprompt + Knowledge zusammen ein auditierbares Ergebnis erzeugen.</p></div></div>
+            </div>
+          </div>
+
+          <div class="usecase-card">
+            <div class="usecase-head">
+              <div>
+                <h3>Demo-Fall 2 (fehlerhaft) – unvollständige Falldaten</h3>
+                <div class="usecase-meta">Didaktik: Umgang mit Lücken, Nachforderungen, eingeschränkter Vorprüfung</div>
+              </div>
+            </div>
+            <div class="tabs" data-tab-group="case2">
+              <button class="tab-btn active" data-tab="prompt">1. Prompt-Vorlage (eingesetzt)</button>
+              <button class="tab-btn" data-tab="input">2. Beispiel-Input</button>
+              <button class="tab-btn" data-tab="output">3. Beispiel-Output</button>
+              <button class="tab-btn" data-tab="hint">4. Praxis-Hinweis</button>
+            </div>
+            <div class="tab-content-wrap">
+              <div class="tab-panel" data-panel="prompt"><pre id="case2-prompt"># Aufgabe
+Führe eine strukturierte Vorprüfung einer Arzneimittelbezeichnung durch.
+
+## Ziel
+- Prüfbericht (Vorprüfung)
+- Nur Vollständigkeitsprüfung + offene Punkte, falls Datenlage unzureichend
+
+## Regeln
+- Keine finale Entscheidung
+- Fehlende Daten explizit benennen
+
+## Falldaten
+&lt;&lt;&lt;FALLDATEN&gt;&gt;&gt;
+produktname: NeuroPlus
+antragsteller: Muster AG
+sprachversion: de
+&lt;&lt;&lt;END&gt;&gt;&gt;</pre><div style="margin-top:8px;"><button class="btn" onclick="copyTextBlock('case2-prompt')">Fall 2 Prompt kopieren</button></div></div>
+              <div class="tab-panel hidden" data-panel="input"><pre id="case2-input">Unvollständiger Fall ohne Antrag-ID, Wirkstoff, Verfahrensart. Erwartung: GPT markiert Pflichtfelder als fehlend, erstellt nur eingeschränkte Vorprüfung, fordert Nachreichung/Prüfung an.</pre></div>
+              <div class="tab-panel hidden" data-panel="output"><pre id="case2-output">Erwartete Richtung (gekürzt):
+- Datenlage: unzureichend / teilweise
+- Vollständigkeitsprüfung zeigt fehlende Pflichtfelder (Antrag-ID, Wirkstoff, Verfahrensart)
+- Nur eingeschränkte Vorprüfung möglich
+- Offene Punkte / Nachforderungen klar aufgelistet
+- Hinweis: Manuelle Fachprüfung und Datenergänzung erforderlich</pre></div>
+              <div class="tab-panel hidden" data-panel="hint"><div class="mini-card"><p><strong>Praxis-Hinweis:</strong> Fall 2 ist didaktisch besonders stark, weil er zeigt: Struktur hilft nicht nur bei „guten“ Daten, sondern auch bei der transparenten Bearbeitung unvollständiger Fälle.</p></div></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function copyTextBlock(id){ const el=document.getElementById(id); if(!el) return; const text=el.innerText||el.textContent; navigator.clipboard.writeText(text).then(()=>toast('In die Zwischenablage kopiert.')).catch(()=>toast('Kopieren fehlgeschlagen.')); }
+    function toast(msg){ let t=document.getElementById('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.style.cssText='position:fixed;bottom:16px;right:16px;background:#ffffff;border:1px solid #bfd4f8;color:#213154;padding:10px 12px;border-radius:12px;box-shadow:0 10px 24px rgba(38,71,130,.10);z-index:9999;font-size:.9rem;'; document.body.appendChild(t);} t.textContent=msg; t.style.opacity='1'; clearTimeout(t._timer); t._timer=setTimeout(()=>t.style.opacity='0',1800); }
+    function toggleCompactMode(btn){ document.body.classList.toggle('compact'); const compact=document.body.classList.contains('compact'); document.querySelectorAll('pre').forEach(pre=>pre.style.maxHeight = compact ? '190px' : '380px'); btn.classList.toggle('active',compact); toast(compact?'Kompaktmodus aktiviert':'Kompaktmodus deaktiviert'); }
+    function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden')); const target=document.getElementById(id); if(target) target.classList.remove('hidden'); document.querySelectorAll('.nav-link').forEach(link=>link.classList.toggle('active', link.dataset.target===id)); target?.scrollIntoView({behavior:'smooth', block:'start'}); }
+    document.querySelectorAll('.nav-link').forEach(link=>link.addEventListener('click', ()=>showSection(link.dataset.target)));
+    document.querySelectorAll('.tabs[data-tab-group]').forEach(group=>{
+      group.addEventListener('click', (e)=>{
+        const btn=e.target.closest('.tab-btn'); if(!btn) return;
+        const card=group.closest('.usecase-card') || group.parentElement;
+        group.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        if(!tab) return;
+        card.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('hidden', p.dataset.panel !== tab));
+      });
+    });
+  </script>
+</body>
+</html>
