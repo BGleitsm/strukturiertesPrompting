@@ -1,75 +1,107 @@
-[README.md](https://github.com/user-attachments/files/25557236/README.md)
-# Strukturiertes Prompting -- Workshop Repository
 
-![Status](https://img.shields.io/badge/status-active-blue)
-![Focus](https://img.shields.io/badge/focus-regulated%20AI-critical)
-![License](https://img.shields.io/badge/license-internal-lightgrey)
+Verhindert Kontextvermischung und reduziert Halluzinationen.
 
-Repository für strukturiertes, auditierbares Prompting im Pharma- und
-Behördenkontext.\
-Schwerpunkt: reproduzierbare Prompt-Architekturen, regulatorische
-Nachvollziehbarkeit und Advanced-Workflows.
+---
 
-------------------------------------------------------------------------
+### 3. Schema-first-Prinzip
 
-## Quick Start
+Erst Output-Format festlegen, z. B.:
 
-1.  Prinzip: **Task → Kontext → Struktur → Output-Format**
-2.  Delimiter konsequent einsetzen (`<<<INPUT>>>`, XML, Markdown-Blöcke)
-3.  Output explizit spezifizieren (Tabellen, JSON, strukturierte
-    Bulletpoints)
-4.  Ergebnisse fachlich validieren
+- JSON-Struktur
+- Bewertungstabelle
+- Requirement-Matrix
+- Findings Log
+- Konfliktprotokoll
 
-------------------------------------------------------------------------
+Dann Verarbeitung des Inputs.
 
-## Repository-Struktur
+---
 
-    .
-    ├── Grundlagen_Prompting
-    │   ├── Kernprinzipien
-    │   ├── Template-Strukturen
-    │   └── Regulatorische Use Cases
-    │
-    ├── Advanced_R_CustomGPT
-    │   ├── Strukturierte Code-Generierung (R)
-    │   ├── Validierungslogik
-    │   ├── Prüfmechanismen
-    │   └── CustomGPT-Workflow-Architektur
-    │
-    └── README.md
+### 4. Verifier-Logik (Guardrail)
 
-------------------------------------------------------------------------
+Zweiter Prompt als Prüfinstanz:
 
-## Kerninhalte
+- Aussage gegen Originaltext abgleichen
+- Status: `belegt` / `unbelegt`
+- Korrektur + Fundstelle angeben
+- „No answer allowed“, wenn keine Evidenz vorhanden
 
-### Grundlagen -- Strukturiertes Prompting
+---
 
--   Saubere Task-Definition
--   Delimiter-Architektur (Markdown/XML)
--   Output-Kontrolle
--   Fehler- und Halluzinationsreduktion
--   Einsatz im regulierten Umfeld
+## Zentrale Use-Case-Kategorien
 
-### Advanced -- R & CustomGPT
+### A) Extrahieren & Transformieren
 
--   Deterministische Code-Generierung
--   Eingebaute Validierungsroutinen
--   Strukturierte Analyse-Workflows
--   Governance-Design für CustomGPT-Systeme
+**Typische Outputs:**
 
-------------------------------------------------------------------------
+- Strukturierte JSON-Extraktion
+- Tabellen mit Units & Analysepopulation
+- Claim-Listen mit Red Flags
 
-## Zielsetzung
+**Beispiele:**
 
--   Standardisierung von Prompt-Architekturen\
--   Minimierung regulatorischer Risiken\
--   Nachvollziehbare AI-Workflows\
--   Transfer in Weiterbildung und Hochschulkontext
+- Studienparameter extrahieren
+- Text → Schema-Tabelle
+- Qualitätsdokumente auf Inkonsistenzen prüfen
 
-------------------------------------------------------------------------
+---
+
+### B) Zusammenfassen & Konsolidieren
+
+**Typische Outputs:**
+
+- PICO-Struktur
+- Ergebnistabellen mit CI/p-Werten
+- Multi-Source-Konsolidierung
+- Konfliktlog (nicht wegformulieren, sondern dokumentieren)
+
+**Prinzip:**  
+Narrativ folgt Tabelle – nicht umgekehrt.
+
+---
+
+### C) Prüfen & Bewerten (Advanced)
+
+**Typische Outputs:**
+
+- Rubrik-Scoring mit Evidenz
+- Requirement-Matrix (`Pass` / `Partial` / `Fail` / `Unknown`)
+- Gap-Analyse
+- Findings Log (objektiv formuliert, keine Urteile)
+
+**Bewertungsregel:**  
+Wenn Beleg fehlt → konservativ bewerten + „Beleg fehlt“ dokumentieren.
+
+---
+
+## Auditierbare Output-Typen
+
+- Evidence-annotiertes JSON
+- Tabellen mit:
+  - Einheit
+  - Analysepopulation
+  - Zeitpunkt
+  - Fundstelle
+- Requirement-Traceability-Matrix
+- Konfliktprotokoll
+- Reviewer-Findings-Log
+
+Alle Outputs müssen so formuliert sein, dass ein Reviewer sie ohne KI nachvollziehen kann.
+
+---
 
 ## Governance-Hinweis
 
-Alle generierten Inhalte sind fachlich zu prüfen.\
-Regulatorische Freigaben erfolgen ausschließlich durch qualifizierte
-Fachstellen.
+- KI ist Assistenz, nicht Entscheidungsinstanz.
+- Reviewer-Sign-off ist verpflichtend.
+- Automatisierte Zusammenfassungen benötigen Verifier-Step.
+- Keine regulatorische Freigabe ohne fachliche Prüfung.
+
+---
+
+## Zielsetzung Workshop 2
+
+- Transfer von strukturiertem Prompting in wissenschaftliche Arbeitsprozesse  
+- Minimierung von Halluzinations- und Compliance-Risiken  
+- Aufbau reproduzierbarer, auditierbarer KI-Workflows  
+- Anwendung in Studium, Forschung und regulierten Industriekontexten  
