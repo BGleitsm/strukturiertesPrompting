@@ -1,1 +1,1052 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Workshop One-Pager – Wissenschaftliche Wissensaufbereitung mit GenAI</title>
+  <style>
+    :root{
+      --sky-50:#f2f9ff;
+      --sky-100:#e6f4ff;
+      --sky-200:#cfeaff;
+      --sky-300:#a9d8ff;
+      --sky-600:#1f7bd6;
+      --ink:#0b1b2b;
+      --muted:#4b5d73;
+      --card:#ffffff;
+      --shadow: 0 10px 25px rgba(8, 25, 45, 0.08);
+      --shadow2: 0 14px 34px rgba(8, 25, 45, 0.12);
+      --radius:16px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color:var(--ink);
+      background: linear-gradient(180deg, var(--sky-50), #fff 38%, #fff);
+    }
 
+    /* Sticky header */
+    .sticky-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background: linear-gradient(90deg, var(--sky-200), var(--sky-100));
+      border-bottom: 1px solid rgba(31,123,214,0.15);
+      backdrop-filter: blur(10px);
+    }
+    .header-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:280px;
+    }
+    .logo{
+      width:40px; height:40px;
+      border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--sky-200) 55%, var(--sky-300));
+      box-shadow: 0 6px 14px rgba(31,123,214,0.18);
+      border: 1px solid rgba(31,123,214,0.18);
+    }
+    .brand h1{
+      font-size:15px;
+      margin:0;
+      font-weight:800;
+      letter-spacing:0.1px;
+      line-height:1.2;
+    }
+    .brand .sub{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.15;
+    }
+    nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    nav a{
+      text-decoration:none;
+      font-size:12px;
+      color:var(--ink);
+      padding:8px 10px;
+      border-radius:999px;
+      border: 1px solid rgba(31,123,214,0.18);
+      background: rgba(255,255,255,0.55);
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      will-change: transform;
+    }
+    nav a:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(31,123,214,0.12);
+      background: #fff;
+    }
+
+    /* Layout */
+    .wrap{
+      max-width:1100px;
+      margin:18px auto 64px;
+      padding:0 16px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media (min-width: 980px){
+      .grid{
+        grid-template-columns: 1.15fr .85fr;
+        gap:18px;
+      }
+    }
+
+    /* Cards */
+    .card{
+      background:var(--card);
+      border:1px solid rgba(31,123,214,0.12);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow2);
+      border-color: rgba(31,123,214,0.22);
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(31,123,214,0.10);
+      background: linear-gradient(180deg, rgba(230,244,255,0.65), rgba(255,255,255,0.0));
+    }
+    .card .hd h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:0.2px;
+    }
+    .card .bd{
+      padding:14px 16px;
+    }
+
+    .pillrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: var(--sky-100);
+      border:1px solid rgba(31,123,214,0.12);
+      color: #0e3b6b;
+    }
+    .note{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.5;
+      margin:10px 0 0;
+    }
+    .big{
+      font-size:13px;
+      line-height:1.55;
+      margin:0;
+      color:#14334f;
+    }
+    .checklist{
+      margin:10px 0 0;
+      padding-left:18px;
+      color:#193b5c;
+      font-size:13px;
+      line-height:1.55;
+    }
+    .checklist li{ margin:6px 0; }
+    .callout{
+      border-left: 4px solid var(--sky-600);
+      padding:10px 12px;
+      background: var(--sky-50);
+      border-radius:12px;
+      margin-top:10px;
+      font-size:13px;
+      color:#113150;
+    }
+
+    /* Use case table */
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size:12.5px;
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(31,123,214,0.10);
+      vertical-align:top;
+    }
+    th{
+      text-align:left;
+      font-size:12px;
+      color:#214462;
+      letter-spacing:0.15px;
+      background: rgba(230,244,255,0.35);
+    }
+    tr:hover td{
+      background: rgba(242,249,255,0.55);
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(31,123,214,0.16);
+      background:#fff;
+      color:#214462;
+      font-size:11.5px;
+      white-space:nowrap;
+    }
+    .tag.selected{
+      background: var(--sky-100);
+      border-color: rgba(31,123,214,0.28);
+      font-weight:700;
+    }
+    .score{
+      font-variant-numeric: tabular-nums;
+      font-weight:700;
+      color:#123b63;
+    }
+
+    /* Workshop core */
+    .uc-list{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    .uc-card{
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(31,123,214,0.12);
+      background: linear-gradient(180deg, rgba(230,244,255,0.35), rgba(255,255,255,0.0));
+      cursor:pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      box-shadow: 0 6px 18px rgba(8, 25, 45, 0.06);
+      position:relative;
+      overflow:hidden;
+    }
+    .uc-card:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(circle at 15% 20%, rgba(31,123,214,0.16), transparent 55%);
+      opacity:0;
+      transition: opacity .18s ease;
+      pointer-events:none;
+    }
+    .uc-card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(8, 25, 45, 0.10);
+      border-color: rgba(31,123,214,0.22);
+    }
+    .uc-card:hover:before{ opacity:1; }
+    .uc-card.active{
+      border-color: rgba(31,123,214,0.40);
+      box-shadow: 0 18px 38px rgba(31,123,214,0.16);
+      background: linear-gradient(180deg, rgba(207,234,255,0.75), rgba(255,255,255,0.0));
+    }
+    .uc-title{
+      font-weight:800;
+      font-size:13px;
+      margin:0;
+    }
+    .uc-meta{
+      margin:6px 0 0;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    /* Detail panel */
+    .detail h3{
+      margin:0;
+      font-size:13px;
+      letter-spacing:0.15px;
+    }
+    .detail .subline{
+      margin:8px 0 12px;
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.45;
+    }
+    .codebox{
+      position:relative;
+      background:#071827;
+      color:#eaf3ff;
+      border-radius:14px;
+      padding:12px 12px 12px;
+      border:1px solid rgba(31,123,214,0.22);
+      box-shadow: 0 10px 25px rgba(7,24,39,0.22);
+    }
+    pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-size:12px;
+      line-height:1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Buttons */
+    .btnrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(31,123,214,0.22);
+      background:#fff;
+      color:#123b63;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:12.5px;
+      font-weight:800;
+      cursor:pointer;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(31,123,214,0.14);
+      border-color: rgba(31,123,214,0.34);
+      background: rgba(230,244,255,0.35);
+    }
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(31,123,214,0.14), rgba(230,244,255,0.55));
+      border-color: rgba(31,123,214,0.35);
+    }
+    .btn:disabled{
+      opacity:0.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none;
+    }
+
+    .toast{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      background: rgba(7,24,39,0.92);
+      color:#eaf3ff;
+      border:1px solid rgba(31,123,214,0.35);
+      padding:10px 12px;
+      border-radius:12px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+      opacity:0;
+      transform: translateY(10px);
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      font-size:12.5px;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    /* Section anchors */
+    .section-title{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .section-title small{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .divider{
+      height:1px;
+      background: rgba(31,123,214,0.10);
+      margin:12px 0 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="sticky-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Workshop One-Pager: Wissenschaftliche Wissensaufbereitung mit GenAI</h1>
+          <p class="sub">Strukturiertes Prompting • Evidenzpflicht • Auditierbare Outputs</p>
+        </div>
+      </div>
+      <nav>
+        <a href="#a">A) Zentrale Regeln</a>
+        <a href="#b">B) Use-Case-Überblick</a>
+        <a href="#c">C) Cluster</a>
+        <a href="#d">D) Workshop-Kern</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- A) -->
+    <section id="a" class="card">
+      <div class="hd">
+        <div class="section-title">
+          <h2>A) Was ist zu beachten bei KI in wissenschaftlicher Wissensaufbereitung?</h2>
+          <small>Merksatz: „Nur belegen, was im Input steht – alles andere ist UNBEKANNT.“</small>
+        </div>
+      </div>
+      <div class="bd">
+        <p class="big">
+          In regulierten Kontexten (Pharma) zählt nicht „klingt plausibel“, sondern <b>Nachvollziehbarkeit</b>:
+          Jede Kernaussage benötigt <b>Fundstellen</b> (Seite/Zeile/Abschnitt) und eine klare Trennung von <b>Fakt</b> vs <b>Interpretation</b>.
+        </p>
+
+        <ul class="checklist">
+          <li><b>Evidenzpflicht:</b> Jede wichtige Aussage mit Zitat + Location (z. B. „DOK A, S.1, Z.12–15“).</li>
+          <li><b>No invention:</b> Keine neuen Zahlen, keine Quellen, keine Normen/Paragraphen „aus dem Kopf“.</li>
+          <li><b>UNBEKANNT zulassen:</b> Fehlende Informationen explizit markieren, statt zu füllen.</li>
+          <li><b>Schema-first:</b> Erst Output-Struktur definieren (JSON/Tabelle/Rubrik), dann Input verarbeiten.</li>
+          <li><b>Verifier-Step:</b> Zweiter Prompt als „Prüfer“ gegen den Originaltext (Halluzinations-Guardrail).</li>
+          <li><b>Audit Trail:</b> Ergebnisse so formulieren, dass ein Reviewer sie ohne KI nachvollziehen kann.</li>
+        </ul>
+
+        <div class="callout">
+          <b>Praxisregel (Workshop):</b> Wir arbeiten immer mit <b>Delimiter</b> (<<<INPUT>>> … <<<END>>>),
+          und wir verlangen <b>Evidence Snippets</b> + <b>Location</b> bei jeder Bewertung/Extraktion.
+        </div>
+
+        <div class="pillrow">
+          <span class="pill">Delimiter</span>
+          <span class="pill">Zitationspflicht</span>
+          <span class="pill">Fakten vs Interpretation</span>
+          <span class="pill">Rubriken & Checklisten</span>
+          <span class="pill">Verifier Prompt</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- B) -->
+    <section id="b" class="card">
+      <div class="hd">
+        <div class="section-title">
+          <h2>B) Use-Case-Tabelle (Überblick)</h2>
+          <small>✓ erscheint erst nach Klick im Workshop-Kern.</small>
+        </div>
+      </div>
+      <div class="bd">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:30%">Use Case</th>
+              <th style="width:16%">Cluster</th>
+              <th style="width:18%">Eignung</th>
+              <th>Typischer Output</th>
+            </tr>
+          </thead>
+          <tbody id="usecaseTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- C) -->
+    <section id="c" class="card">
+      <div class="hd">
+        <div class="section-title">
+          <h2>C) Clusterung (Prompt-Muster wiederverwenden)</h2>
+          <small>3 Gruppen – 1 Logik: Schema + Evidenz + Guardrail.</small>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid" style="grid-template-columns: 1fr; gap:12px;">
+          <div class="card" style="box-shadow:none;">
+            <div class="hd"><h2>1) Extrahieren & Transformieren</h2></div>
+            <div class="bd">
+              <p class="note">Dokument → strukturierter Output (JSON/Tabelle), mit Fundstellen.</p>
+              <div class="pillrow">
+                <span class="pill">Extraktion</span>
+                <span class="pill">Tabellen</span>
+                <span class="pill">Textanalyse</span>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="box-shadow:none;">
+            <div class="hd"><h2>2) Zusammenfassen & Konsolidieren</h2></div>
+            <div class="bd">
+              <p class="note">Studien/CSR → PICO/Results; Multi-Source → Kernaussagen + Konfliktlog.</p>
+              <div class="pillrow">
+                <span class="pill">Zusammenfassung</span>
+                <span class="pill">Konsolidierung</span>
+                <span class="pill">Drafting</span>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="box-shadow:none;">
+            <div class="hd"><h2>3) Prüfen & Bewerten (Advanced)</h2></div>
+            <div class="bd">
+              <p class="note">Rubriken, Gap-Analysen und Review-Logs mit Evidenzpflicht + Verifier-Step.</p>
+              <div class="pillrow">
+                <span class="pill">Rubrik-Scoring</span>
+                <span class="pill">Leitlinie/DIN-Abgleich</span>
+                <span class="pill">Qualitätsdossier-Review</span>
+                <span class="pill">Guardrails</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- D) -->
+    <section id="d" class="card">
+      <div class="hd">
+        <div class="section-title">
+          <h2>D) Workshop-Kern – Use Case klicken (✓ toggelt) → Inhalt rechts erscheint</h2>
+          <small>Prompt-Vorlage • Beispiel-Input/Output Download • Praxis-Hinweis</small>
+        </div>
+      </div>
+
+      <div class="bd">
+        <div class="grid">
+          <div class="uc-list" id="ucList"></div>
+
+          <div class="card detail" style="box-shadow:none;">
+            <div class="hd">
+              <h2 id="detailTitle">Use Case auswählen</h2>
+            </div>
+            <div class="bd">
+              <p class="subline" id="detailSubline">
+                Klicke links auf einen Use Case – erst dann werden Prompt, Input/Output und Hinweise angezeigt.
+              </p>
+
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
+                <h3>Prompt-Vorlage (copy/paste)</h3>
+                <div class="btnrow" style="margin:0;">
+                  <button class="btn primary" id="btnCopyPrompt" disabled>Prompt kopieren</button>
+                </div>
+              </div>
+              <div class="codebox">
+                <pre id="promptBox">—</pre>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="btnrow">
+                <button class="btn" id="btnDownloadInput" disabled>Beispiel-Input herunterladen</button>
+                <button class="btn" id="btnDownloadOutput" disabled>Beispiel-Output herunterladen</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <h3>Praxis-Hinweis</h3>
+              <div class="callout" id="practiceHint">—</div>
+
+              <div class="pillrow" id="detailPills" style="margin-top:12px;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast">Kopiert.</div>
+
+  <!-- SCRIPT at the END (important) -->
+  <script>
+    // ---------- Synthetic mini datasets ----------
+    const DATASETS = {
+      "DOK_A_Studie.txt": `[DOK A | Studie | Seite 1]
+Zeile 01: Title: A randomized, double-blind trial of Nephroxan in mild-to-moderate IgA nephropathy
+Zeile 02: Background: Proteinuria reduction is associated with improved renal outcomes.
+Zeile 03: Methods: Multicenter, randomized, double-blind, placebo-controlled trial.
+Zeile 04: Population: Adults 18–70 years with biopsy-confirmed IgA nephropathy, eGFR 35–90 mL/min/1.73m²,
+Zeile 05: and baseline UPCR 0.8–3.5 g/g despite stable ACEi/ARB ≥12 weeks.
+Zeile 06: Randomization 1:1 to Nephroxan 100 mg once daily vs placebo for 24 weeks.
+Zeile 07: Primary endpoint: percent change in UPCR from baseline to Week 24.
+Zeile 08: Secondary endpoints: change in eGFR, proportion achieving ≥30% UPCR reduction, safety.
+Zeile 09: Statistical analysis: ANCOVA with baseline UPCR as covariate; two-sided alpha 0.05.
+Zeile 10: Analysis population: intention-to-treat (ITT).
+Zeile 11: Results: n=220 randomized (Nephroxan n=110; placebo n=110). Mean age 42.1 years; 38% female.
+Zeile 12: Primary endpoint: mean percent UPCR change at Week 24 was -28.4% (Nephroxan) vs -11.2% (placebo);
+Zeile 13: adjusted difference -17.1 percentage points; 95% CI -24.9 to -9.3; p<0.001.
+Zeile 14: Secondary: ≥30% UPCR reduction achieved by 52/110 (47.3%) vs 29/110 (26.4%).
+Zeile 15: eGFR change (Week 24 vs baseline): -1.8 vs -2.0 mL/min/1.73m² (difference 0.2; 95% CI -0.6 to 1.0).
+Zeile 16: Safety: Any AE 61% vs 58%. Serious AEs 3% vs 2%.
+Zeile 17: Most common AEs (Nephroxan): nausea (9%), headache (8%), mild hyperkalemia (6%).
+Zeile 18: Conclusion: Nephroxan reduced proteinuria at Week 24 with no major safety signal observed.
+
+[DOK A | Studie | Seite 2]
+Zeile 01: Limitations: Study duration 24 weeks; not powered for long-term renal outcomes.
+Zeile 02: Protocol deviations: 7 participants discontinued due to withdrawal of consent (4 Nephroxan, 3 placebo).
+Zeile 03: Missing data handling: multiple imputation for primary endpoint sensitivity analysis.
+Zeile 04: Sensitivity result: adjusted difference -16.4 percentage points; p<0.001.
+`,
+      "DOK_B_CSR_Auszug.txt": `[DOK B | CSR-Auszug | Seite 12]
+Zeile 01: 14.2 Primary Efficacy Analysis (ITT)
+Zeile 02: Baseline UPCR (g/g) mean (SD): Nephroxan 1.62 (0.63); Placebo 1.59 (0.61).
+Zeile 03: Week 24 UPCR (g/g) mean (SD): Nephroxan 1.13 (0.58); Placebo 1.41 (0.64).
+Zeile 04: Percent change from baseline mean (SE): -28.4% (2.7) vs -11.2% (2.9).
+Zeile 05: ANCOVA adjusted difference: -17.1 pp; 95% CI -24.9 to -9.3; p<0.001.
+Zeile 06: Per-protocol (PP) analysis difference: -15.2 pp; 95% CI -23.8 to -6.6; p=0.001.
+
+[DOK B | CSR-Auszug | Seite 21]
+Zeile 01: 16.2 Adverse Events
+Zeile 02: Any AE: 61% vs 58%. Serious AEs: 3% vs 2%.
+Zeile 03: Hyperkalemia (any grade): 6.4% vs 2.7%.
+Zeile 04: Discontinuations due to AE: 2 (1.8%) vs 1 (0.9%).
+Zeile 05: No deaths occurred.
+`,
+      "DOK_C_Guideline_Auszug.txt": `[DOK C | Guideline-Auszug | Seite 3]
+Zeile 01: Section 2.1 Evidence Requirements for Proteinuria-Reducing Therapies
+Zeile 02: R1: Primary endpoint should be clinically meaningful or a validated surrogate; justify surrogate use.
+Zeile 03: R2: Randomized controlled design preferred; describe randomization and blinding procedures.
+Zeile 04: R4: Define analysis sets (ITT/PP) and missing data handling.
+Zeile 05: R5: Report effect size with confidence intervals; avoid p-value-only reporting.
+`,
+      "DOK_D_Standard_Auszug.txt": `[DOK D | Standard-Auszug | Seite 2]
+Zeile 01: S3: Data tables shall specify units and population/analysis set.
+Zeile 02: S4: Claims shall cite source location (page/section) and evidence snippet.
+Zeile 03: S5: Any automated summary must include a verification step and reviewer sign-off.
+`,
+      "DOK_E_Qualitaetsdossier_Auszug.txt": `[DOK E | Qualitätsdossier-Auszug | Seite 7]
+Zeile 01: The drug substance Nephroxan-API is specified for assay 98.0–102.0% (HPLC).
+
+[DOK E | Qualitätsdossier-Auszug | Seite 8]
+Zeile 01: Table DS-1: Batch Results (Assay, %)
+Zeile 02: Batch A01: 101.8
+Zeile 03: Batch A02: 102.4
+Zeile 04: Batch A03: 101.9
+
+[DOK E | Qualitätsdossier-Auszug | Seite 10]
+Zeile 01: Change control: "Process changed in 2025-Q4 to improve yield."
+Zeile 02: Impact assessment: "No impact expected." (No supporting data provided here.)
+`,
+      "DOK_G_Konflikt_Set.txt": `[Quelle G1 | E-Mail-Notiz | Seite 1]
+Zeile 01: "Nephroxan showed no increased risk of hyperkalemia compared with placebo."
+
+[Quelle G2 | CSR-Excerpt | Seite 21]
+Zeile 01: Hyperkalemia (any grade): 6.4% vs 2.7%.
+
+[Quelle G3 | Slide Draft | Seite 2]
+Zeile 01: "Most common AEs: nausea (9%), headache (8%), hyperkalemia (2%)."
+`
+    };
+
+    // ---------- Use cases (no default selection) ----------
+    const USECASES = [
+      {
+        id:"extract",
+        title:"Extraktion aus Dokumenten (Structured Extraction)",
+        cluster:"Extrahieren & Transformieren",
+        suitability:"🟢 sehr geeignet",
+        typical:"JSON-Felder + Evidence Snippet + Location",
+        pills:["JSON","Evidence","Delimiter","Auditierbar"],
+        inputFile:"DOK_A_Studie.txt",
+        outputFileName:"BeispielOutput_Extraktion.json",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Keine erfundenen Zahlen/Quellen. UNBEKANNT markieren. Fakten/Interpretation trennen.
+Fundstelle je Feld: DOK/Seite/Zeile. Output strikt als JSON.
+
+# INPUT
+<<<INPUT>>>
+[Dokumenttext]
+<<<END>>>
+
+# OUTPUT (JSON)
+{
+  "document_id":"...",
+  "extractions":[
+    {"field":"...","value":"...","evidence_quote":"...","location":"DOK X S.# Z.#-#","confidence":"hoch|mittel|niedrig","notes":""}
+  ],
+  "missing_fields":["..."],
+  "follow_up_questions":["..."]
+}`,
+        output:`{
+  "document_id":"DOK A",
+  "extractions":[
+    {"field":"Studiendesign","value":"randomized, double-blind, placebo-controlled trial","evidence_quote":"randomized, double-blind, placebo-controlled trial","location":"DOK A S.1 Z.03","confidence":"hoch","notes":""}
+  ],
+  "missing_fields":["Version/Datum/Quelle"],
+  "follow_up_questions":["Bitte Version/Datum/Owner nachreichen."]
+}`,
+        hint:"Praxis: Erst Schema fixieren, dann extrahieren. Jede Zeile benötigt Evidence+Location."
+      },
+      {
+        id:"summary",
+        title:"Zusammenfassung von Studien/Texten (PICO + Results)",
+        cluster:"Zusammenfassen & Konsolidieren",
+        suitability:"🟢 sehr geeignet",
+        typical:"PICO + Ergebnis-Tabelle + Evidenz-Anhang",
+        pills:["PICO","Zahlen exakt","Tabelle","Evidence"],
+        inputFile:"DOK_A_Studie.txt",
+        outputFileName:"BeispielOutput_StudienSummary.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Keine neuen Fakten. Alle Zahlen exakt. Jede Ergebnis-Aussage mit Fundstelle.
+
+# INPUT
+<<<INPUT>>>
+[Studientext]
+<<<END>>>
+
+# OUTPUT (Markdown)
+## PICO
+## Methods
+## Results (Tabelle mit Fundstellen)
+## Safety
+## Limitations
+## Evidenz-Anhang`,
+        output:`## Results
+| Outcome | Wert | CI/p | Fundstelle |
+|---|---|---|---|
+| UPCR % change Week 24 | adjusted difference -17.1 pp | 95% CI -24.9 to -9.3; p<0.001 | DOK A S.1 Z.12-13 |`,
+        hint:"Praxis: Erst die Ergebnistabelle, dann die Narrative. Das verhindert „schöne“ Halluzinationen."
+      },
+      {
+        id:"scoring",
+        title:"Bewertung nach standardisierten Kriterien (Rubrik-Scoring)",
+        cluster:"Prüfen & Bewerten",
+        suitability:"🟢 sehr geeignet",
+        typical:"Score-Tabelle + Begründung + Evidenz",
+        pills:["Rubrik","Score","Evidenz","Unsicherheit"],
+        inputFile:"DOK_A_Studie.txt",
+        outputFileName:"BeispielOutput_RubrikScoring.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Bewertung nur aus Input. Jede Begründung mit Evidenzstelle.
+Wenn Beleg fehlt: konservativ + "Beleg fehlt".
+
+# INPUT
+<<<INPUT>>>...<<<END>>>
+
+# OUTPUT
+| Kriterium | Score | Begründung | Evidenz | Unsicherheit |`,
+        output:`| Methodische Qualität | 3 | RCT, double-blind | DOK A S.1 Z.03 | niedrig |`,
+        hint:"Praxis: Pro Kriterium eine Person. Dann gibt es weniger „weiche“ Begründungen."
+      },
+      {
+        id:"consolidate",
+        title:"Konsolidierung (Merge + Konfliktlog)",
+        cluster:"Zusammenfassen & Konsolidieren",
+        suitability:"🟢 sehr geeignet",
+        typical:"Kernaussagen + Konfliktlog",
+        pills:["Merge","Konflikte","Traceability"],
+        inputFile:"DOK_G_Konflikt_Set.txt",
+        outputFileName:"BeispielOutput_Konsolidierung.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Konflikte nicht wegformulieren. Nicht entscheiden, sondern dokumentieren. Jede Aussage mit Quelle.
+
+# INPUT
+Quelle A: <<<A>>>...<<<END>>>
+Quelle B: <<<B>>>...<<<END>>>
+Quelle C: <<<C>>>...<<<END>>>
+
+# OUTPUT
+## Kernaussagen
+## Konfliktlog`,
+        output:`## Konfliktlog
+| Thema | Konflikt | Evidenz |
+|---|---|---|
+| Hyperkalämie | Aussage A widerspricht Daten B; Slide C nennt andere Zahl | G1 S.1 Z.01; G2 S.21 Z.01; G3 S.2 Z.01 |`,
+        hint:"Praxis: Konfliktlog ist das Produkt. Ohne Konfliktlog kein Review-Mehrwert."
+      },
+      {
+        id:"tables",
+        title:"Tabellen erstellen (Text → Schema-Tabelle)",
+        cluster:"Extrahieren & Transformieren",
+        suitability:"🟢 sehr geeignet",
+        typical:"Schema-Tabelle + Units + Fundstellen",
+        pills:["Schema-first","Units","Location"],
+        inputFile:"DOK_B_CSR_Auszug.txt",
+        outputFileName:"BeispielOutput_Tabelle.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Wenn Spalte nicht ableitbar: UNBEKANNT. Fundstelle je Zeile.
+
+# INPUT
+<<<INPUT>>>...<<<END>>>
+
+# OUTPUT
+| Entität | Definition | Wert(e) | Einheit | Gruppe | Zeitpunkt | Fundstelle |`,
+        output:`| Hyperkalemia (any grade) | Hyperkalemia (any grade) | 6.4% vs 2.7% | % | Nephroxan vs Placebo | UNBEKANNT | DOK B S.21 Z.03 |`,
+        hint:"Praxis: Einheiten + Analysepopulation erzwingen – sonst ist die Tabelle nicht auditierbar."
+      },
+      {
+        id:"textanalysis",
+        title:"Textanalyse (Claims + Red Flags)",
+        cluster:"Extrahieren & Transformieren",
+        suitability:"🟢 sehr geeignet",
+        typical:"Claim-Liste + Red Flags",
+        pills:["Claims","Red Flags","Consistency"],
+        inputFile:"DOK_E_Qualitaetsdossier_Auszug.txt",
+        outputFileName:"BeispielOutput_Textanalyse.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Extrahiere überprüfbare Claims. Markiere Inkonsistenzen/Red Flags mit Fundstellen.
+
+# INPUT
+<<<INPUT>>>...<<<END>>>
+
+# OUTPUT
+## Claim-Liste
+## Red Flags`,
+        output:`## Red Flags
+- Batch A02 102.4% > Spec 102.0% → potenzielles OOS (DOK E S.7 Z.01; S.8 Z.03).`,
+        hint:"Praxis: Textanalyse vor Review. Dann sind Nachforderungen objektiver."
+      },
+      {
+        id:"guardrails",
+        title:"Halluzinations-Guardrails (Verifier Mode)",
+        cluster:"Prüfen & Bewerten",
+        suitability:"🟢 sehr geeignet",
+        typical:"Belegt/Unbelegt + bereinigte Version",
+        pills:["Verifier","Cleanup","No-answer allowed"],
+        inputFile:"DOK_B_CSR_Auszug.txt",
+        outputFileName:"BeispielOutput_Verifier.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Du bist Verifizierer. Prüfe streng gegen Originaltext. Markiere unbelegte Aussagen.
+
+# INPUT
+Original: <<<TEXT>>>...<<<END>>>
+Antwort:  <<<ANSWER>>>...<<<END>>>
+
+# OUTPUT
+| Aussage | Status | Korrektur | Evidenz |`,
+        output:`| "Hyperkalemia 2%" | unbelegt | 6.4% vs 2.7% | DOK B S.21 Z.03 |`,
+        hint:"Praxis: Verifier-Step verpflichtend bei Zahlen/Compliance-Bezug."
+      },
+      {
+        id:"guideline",
+        title:"Leitlinien/DIN-Abgleich (Requirement-Matrix + Gap)",
+        cluster:"Prüfen & Bewerten (Advanced)",
+        suitability:"🟡 geeignet mit Leitplanken",
+        typical:"Pass/Partial/Fail/Unknown + Gaps",
+        pills:["Requirements","Gap","Traceability"],
+        inputFile:"DOK_C_Guideline_Auszug.txt",
+        outputFileName:"BeispielOutput_GuidelineGap.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Requirements atomar. Nur Abgleich. Status: Pass/Partial/Fail/Unknown.
+
+# INPUT
+Leitlinie: <<<GUIDE>>>...<<<END>>>
+Material:  <<<DOSSIER>>>...<<<END>>>
+
+# OUTPUT
+| Req-ID | Requirement | Evidenz | Status | Gap |`,
+        output:`| R2 | Randomisierung/Blinding beschreiben | DOK A S.1 Z.03 (Blinding); Randomisierungsmethode fehlt | Partial | Randomisierungsmethode/Allocation concealment nachfordern |`,
+        hint:"Praxis: Jede Gruppe 2–3 Requirements → konsistente Gap-Liste."
+      },
+      {
+        id:"qdos",
+        title:"Qualitätsdossier Review (Findings Log)",
+        cluster:"Prüfen & Bewerten (Advanced)",
+        suitability:"🟡 geeignet mit Leitplanken",
+        typical:"Findings + Kritikalität + Nachforderung",
+        pills:["Findings","CMC","Nachforderung"],
+        inputFile:"DOK_E_Qualitaetsdossier_Auszug.txt",
+        outputFileName:"BeispielOutput_FindingsLog.md",
+        prompt:`# SYSTEM / WORKING AGREEMENT
+Reviewer-Assist. Findings objektiv + Evidenz + Nachforderung. Keine finalen Bewertungen.
+
+# INPUT
+<<<INPUT>>>...<<<END>>>
+
+# OUTPUT
+| ID | Bereich | Finding | Evidenz | Kritikalität | Nachforderung |`,
+        output:`| F-01 | DS Assay | A02 102.4% über Spec 102.0% | DOK E S.7 Z.01; S.8 Z.03 | hoch | OOS-Report/Investigation/Disposition |`,
+        hint:"Praxis: Findings als „X vs Y“ formulieren – nicht als Urteil."
+      }
+    ];
+
+    // ---------- State ----------
+    const selected = new Set();   // toggled via click
+    let activeUC = null;          // last clicked (right panel)
+
+    // ---------- DOM refs ----------
+    const tbody = document.getElementById("usecaseTableBody");
+    const ucList = document.getElementById("ucList");
+
+    const detailTitle = document.getElementById("detailTitle");
+    const detailSubline = document.getElementById("detailSubline");
+    const promptBox = document.getElementById("promptBox");
+    const practiceHint = document.getElementById("practiceHint");
+    const detailPills = document.getElementById("detailPills");
+
+    const btnCopyPrompt = document.getElementById("btnCopyPrompt");
+    const btnDownloadInput = document.getElementById("btnDownloadInput");
+    const btnDownloadOutput = document.getElementById("btnDownloadOutput");
+
+    // ---------- Helpers ----------
+    function showToast(msg){
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(()=>t.classList.remove("show"), 1100);
+    }
+    function downloadText(filename, content){
+      const blob = new Blob([content], {type:"text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function setButtonsEnabled(enabled){
+      btnCopyPrompt.disabled = !enabled;
+      btnDownloadInput.disabled = !enabled;
+      btnDownloadOutput.disabled = !enabled;
+    }
+
+    function setPlaceholder(){
+      activeUC = null;
+      detailTitle.textContent = "Use Case auswählen";
+      detailSubline.textContent = "Klicke links auf einen Use Case – dann erscheint der Inhalt rechts.";
+      promptBox.textContent = "—";
+      practiceHint.textContent = "—";
+      detailPills.innerHTML = "";
+      setButtonsEnabled(false);
+    }
+
+    function setActive(id){
+      const uc = USECASES.find(u => u.id === id);
+      if(!uc) return;
+      activeUC = uc;
+
+      detailTitle.textContent = uc.title;
+      detailSubline.textContent = `${uc.cluster} • ${uc.suitability} • Übungsdatei: ${uc.inputFile}`;
+      promptBox.textContent = uc.prompt;
+      practiceHint.textContent = uc.hint;
+
+      detailPills.innerHTML = "";
+      uc.pills.forEach(p=>{
+        const s = document.createElement("span");
+        s.className = "pill";
+        s.textContent = p;
+        detailPills.appendChild(s);
+      });
+
+      setButtonsEnabled(true);
+    }
+
+    // ---------- Rendering ----------
+    function renderUseCaseTable(){
+      tbody.innerHTML = "";
+      USECASES.forEach(uc => {
+        const tr = document.createElement("tr");
+        const isSel = selected.has(uc.id);
+
+        const td1 = document.createElement("td");
+        td1.innerHTML = `
+          <div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap;">
+            <span class="tag ${isSel ? "selected":""}">${isSel ? "✓ ausgewählt" : "optional"}</span>
+            <div>
+              <div style="font-weight:800; margin-bottom:2px;">${uc.title}</div>
+              <div style="color:var(--muted); font-size:12px;">${uc.typical}</div>
+            </div>
+          </div>
+        `;
+        const td2 = document.createElement("td");
+        td2.textContent = uc.cluster;
+
+        const td3 = document.createElement("td");
+        td3.innerHTML = `<span class="score">${uc.suitability}</span>`;
+
+        const td4 = document.createElement("td");
+        td4.textContent = uc.typical;
+
+        tr.append(td1, td2, td3, td4);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderUseCaseCards(){
+      ucList.innerHTML = "";
+      USECASES.forEach(uc=>{
+        const isSel = selected.has(uc.id);
+        const isActive = activeUC && activeUC.id === uc.id;
+
+        const div = document.createElement("div");
+        div.className = "uc-card" + (isActive ? " active" : "");
+        div.dataset.id = uc.id;
+
+        div.innerHTML = `
+          <p class="uc-title">${uc.title}</p>
+          <div class="uc-meta">
+            <span class="tag ${isSel ? "selected":""}">${isSel ? "✓ ausgewählt" : "optional"}</span>
+            <span class="tag">${uc.cluster}</span>
+            <span class="tag">${uc.suitability}</span>
+          </div>
+        `;
+
+        // CLICK: toggles selection AND shows detail panel
+        div.addEventListener("click", ()=>{
+          if(selected.has(uc.id)) selected.delete(uc.id);
+          else selected.add(uc.id);
+
+          setActive(uc.id);
+          renderUseCaseCards();
+          renderUseCaseTable();
+        });
+
+        ucList.appendChild(div);
+      });
+    }
+
+    // ---------- Button actions ----------
+    btnCopyPrompt.addEventListener("click", async ()=>{
+      if(!activeUC) return;
+      try{
+        await navigator.clipboard.writeText(activeUC.prompt);
+        showToast("Prompt kopiert.");
+      }catch(e){
+        const ta = document.createElement("textarea");
+        ta.value = activeUC.prompt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        showToast("Prompt kopiert (fallback).");
+      }
+    });
+
+    btnDownloadInput.addEventListener("click", ()=>{
+      if(!activeUC) return;
+      const content = DATASETS[activeUC.inputFile] || "—";
+      downloadText(activeUC.inputFile, content);
+      showToast("Input heruntergeladen.");
+    });
+
+    btnDownloadOutput.addEventListener("click", ()=>{
+      if(!activeUC) return;
+      downloadText(activeUC.outputFileName || "BeispielOutput.txt", activeUC.output || "—");
+      showToast("Output heruntergeladen.");
+    });
+
+    // ---------- Init ----------
+    renderUseCaseTable();
+    renderUseCaseCards();
+    setPlaceholder();
+  </script>
+</body>
+</html>
