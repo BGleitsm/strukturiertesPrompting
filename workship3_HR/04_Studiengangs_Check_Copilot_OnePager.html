@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studiengangs-Check – Microsoft Copilot Agent</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef3f9;
+      --text: #172033;
+      --muted: #5d6b82;
+      --primary: #2557d6;
+      --primary-dark: #173b9b;
+      --accent: #b05d1f;
+      --accent-soft: #fff0e3;
+      --success: #17824b;
+      --warning: #b36b00;
+      --danger: #b53a3a;
+      --border: #d9e1ec;
+      --shadow: 0 16px 40px rgba(31, 51, 84, 0.10);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #eef3fb 0%, var(--bg) 35%, #f8fafc 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 72px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .status-card,
+    .card,
+    .step-card,
+    .prompt-card,
+    .test-card {
+      background: rgba(255,255,255,0.96);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -110px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(176,93,31,.22), rgba(176,93,31,0));
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #7b3e13;
+      font-weight: 700;
+      font-size: 0.86rem;
+      letter-spacing: .02em;
+    }
+
+    h1 {
+      margin: 18px 0 16px;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      max-width: 920px;
+    }
+
+    .lead {
+      font-size: 1.14rem;
+      color: var(--muted);
+      max-width: 800px;
+      margin: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(37,87,214,.22);
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .status-card {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .progress-ring-wrap {
+      display: grid;
+      place-items: center;
+      margin: 16px 0 22px;
+    }
+
+    .progress-ring {
+      width: 138px;
+      height: 138px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) 0deg, #e5ebf4 0deg);
+      position: relative;
+    }
+
+    .progress-ring::before {
+      content: "";
+      width: 102px;
+      height: 102px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+    }
+
+    .progress-ring span {
+      position: relative;
+      z-index: 1;
+      font-size: 1.7rem;
+      font-weight: 800;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: var(--muted);
+      font-size: .96rem;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      margin-top: 7px;
+      flex: 0 0 auto;
+    }
+
+    .status-item.done .status-dot { background: var(--success); }
+
+    nav.sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(244,247,251,.88);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255,255,255,.8);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 0;
+      scrollbar-width: thin;
+    }
+
+    .nav-link {
+      white-space: nowrap;
+      text-decoration: none;
+      padding: 8px 11px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .9rem;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #7b3e13;
+      background: var(--accent-soft);
+    }
+
+    main { padding: 30px 0 80px; }
+
+    section { margin: 42px 0 0; scroll-margin-top: 88px; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .section-kicker {
+      color: var(--accent);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .78rem;
+    }
+
+    h2 {
+      margin: 5px 0 0;
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.22rem;
+    }
+
+    .muted { color: var(--muted); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .icon-box {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: #7b3e13;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .step-card {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .step-number {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .step-meta {
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: 5px;
+    }
+
+    .check-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .92rem;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--success);
+      cursor: pointer;
+    }
+
+    .prompt-card { overflow: hidden; }
+
+    .prompt-head {
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .prompt-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .prompt-body { position: relative; }
+
+    textarea.copy-source {
+      display: block;
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      border: 0;
+      outline: 0;
+      padding: 20px;
+      background: #101827;
+      color: #e8eef9;
+      font: 500 .94rem/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .copy-toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      background: #101827;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: .2s ease;
+      z-index: 50;
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-soft);
+      color: #7b3e13;
+      border-color: #efc8a7;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .accordion {
+      display: grid;
+      gap: 12px;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .accordion-btn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 17px 19px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font: inherit;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 0 19px 19px;
+      color: var(--muted);
+    }
+
+    .accordion-item.open .accordion-content { display: block; }
+    .accordion-icon { transition: transform .2s ease; }
+    .accordion-item.open .accordion-icon { transform: rotate(45deg); }
+
+    .callout {
+      border-left: 5px solid var(--warning);
+      background: #fff7e8;
+      padding: 18px 20px;
+      border-radius: 12px;
+      color: #6e4d11;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 14px;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    select {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: white;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .score-result {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      font-weight: 800;
+    }
+
+    .footer {
+      padding: 34px 0 50px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .9rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .step-card {
+        grid-template-columns: auto 1fr;
+      }
+
+      .check-wrap { grid-column: 2; }
+    }
+
+    @media (max-width: 640px) {
+      .container { width: min(100% - 20px, 1180px); }
+      .hero { padding-top: 36px; }
+      .hero-card, .status-card { padding: 24px; }
+      .section-head { align-items: start; flex-direction: column; }
+      .prompt-head { align-items: flex-start; flex-direction: column; }
+      .prompt-actions { width: 100%; }
+      .btn { width: 100%; }
+      .hero-actions { flex-direction: column; }
+    }
+
+    @media print {
+      .sticky-nav,
+      .hero-actions,
+      .btn,
+      .check-wrap,
+      .copy-toast,
+      .tabs {
+        display: none !important;
+      }
+
+      body { background: white; }
+
+      .hero-card,
+      .status-card,
+      .card,
+      .step-card,
+      .prompt-card,
+      .test-card {
+        box-shadow: none;
+      }
+
+      .tab-panel { display: block !important; margin-bottom: 18px; }
+      textarea.copy-source { min-height: auto; overflow: visible; white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="copy-toast" id="copyToast">Text wurde kopiert.</div>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="hero-card">
+        <span class="eyebrow">Praxisübung · Microsoft Copilot Agent</span>
+        <h1>Studiengangs‑Check</h1>
+        <p class="lead">
+          Studieninhalte transparent einem Anforderungsprofil zuordnen – mit Fundstellen,
+          Unsicherheitskennzeichnung und klarer Trennung zwischen Vorprüfung und fachlicher Entscheidung.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#ablauf">Übung starten</a>
+          <button class="btn btn-secondary" type="button" onclick="window.print()">Als PDF drucken</button>
+          <button class="btn btn-secondary" type="button" id="downloadAllBtn">Prompt-Paket herunterladen</button>
+          <button class="btn btn-secondary" type="button" id="resetBtn">Fortschritt zurücksetzen</button>
+        </div>
+      </div>
+
+      <aside class="status-card">
+        <div>
+          <div class="section-kicker">Ihr Fortschritt</div>
+          <div class="progress-ring-wrap">
+            <div class="progress-ring" id="progressRing"><span id="progressText">0%</span></div>
+          </div>
+        </div>
+        <div class="status-list">
+          <div class="status-item"><span class="status-dot"></span><span>Agent einrichten</span></div>
+          <div class="status-item"><span class="status-dot"></span><span>Anforderungsprofil eingeben</span></div>
+          <div class="status-item"><span class="status-dot"></span><span>Studiengang analysieren</span></div>
+          <div class="status-item"><span class="status-dot"></span><span>Gegenprobe durchführen</span></div>
+          <div class="status-item"><span class="status-dot"></span><span>Ergebnis bewerten</span></div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <nav class="sticky-nav">
+    <div class="container nav-inner">
+      <a class="nav-link" href="#ziel">Ziel</a>
+      <a class="nav-link" href="#ablauf">Ablauf</a>
+      <a class="nav-link" href="#agent">Agent</a>
+      <a class="nav-link" href="#prompt">System-Prompt</a>
+      <a class="nav-link" href="#anforderungen">Anforderungsprofil</a>
+      <a class="nav-link" href="#testfaelle">Testfälle</a>
+      <a class="nav-link" href="#arbeitsauftraege">Prompts</a>
+      <a class="nav-link" href="#auswertung">Auswertung</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section id="ziel">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">1 · Orientierung</div>
+          <h2>Ziel der Übung</h2>
+        </div>
+        <p class="muted">Dauer: ca. 40–50 Minuten · Gruppen: 2–4 Personen</p>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <div class="icon-box">1</div>
+          <h3>Inhalte extrahieren</h3>
+          <p class="muted">Der Agent identifiziert relevante Module, Themen und praktische Anteile.</p>
+        </article>
+        <article class="card">
+          <div class="icon-box">2</div>
+          <h3>Kriterien zuordnen</h3>
+          <p class="muted">Er ordnet Fundstellen transparent einem fachlichen Anforderungsprofil zu.</p>
+        </article>
+        <article class="card">
+          <div class="icon-box">3</div>
+          <h3>Unsicherheit sichtbar machen</h3>
+          <p class="muted">Er unterscheidet zwischen erfüllt, teilweise erfüllt, nicht belegt und unklar.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="ablauf">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">2 · Ablauf</div>
+          <h2>Die Übung in fünf Schritten</h2>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <article class="step-card">
+          <div class="step-number">1</div>
+          <div>
+            <h3>Copilot Agent anlegen</h3>
+            <div class="step-meta">Name, Beschreibung und System-Prompt übernehmen.</div>
+          </div>
+          <label class="check-wrap"><input type="checkbox" class="progress-check"> erledigt</label>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">2</div>
+          <div>
+            <h3>Anforderungsprofil eingeben</h3>
+            <div class="step-meta">Die fachlichen Kriterien als verbindliche Prüfbasis festlegen.</div>
+          </div>
+          <label class="check-wrap"><input type="checkbox" class="progress-check"> erledigt</label>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">3</div>
+          <div>
+            <h3>Studiengang zuordnen</h3>
+            <div class="step-meta">Module und Fundstellen transparent den Kriterien zuweisen.</div>
+          </div>
+          <label class="check-wrap"><input type="checkbox" class="progress-check"> erledigt</label>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">4</div>
+          <div>
+            <h3>Schwierige Gegenprobe durchführen</h3>
+            <div class="step-meta">Unklare Modulnamen, fehlende ECTS und nur teilweise passende Inhalte testen.</div>
+          </div>
+          <label class="check-wrap"><input type="checkbox" class="progress-check"> erledigt</label>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">5</div>
+          <div>
+            <h3>Ergebnis bewerten</h3>
+            <div class="step-meta">Fundstellen, Vorsicht, Nachvollziehbarkeit und Entscheidungsgrenzen prüfen.</div>
+          </div>
+          <label class="check-wrap"><input type="checkbox" class="progress-check"> erledigt</label>
+        </article>
+      </div>
+    </section>
+
+    <section id="agent">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">3 · Agent einrichten</div>
+          <h2>Name und Beschreibung</h2>
+        </div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <div>
+            <strong>Agent-Name</strong>
+            <div class="muted">Für das Namensfeld.</div>
+          </div>
+          <div class="prompt-actions">
+            <button class="btn btn-secondary copy-btn" data-copy-target="agentName">Kopieren</button>
+            <button class="btn btn-secondary download-btn" data-download-target="agentName" data-filename="Agent-Name.txt">Herunterladen</button>
+          </div>
+        </div>
+        <div class="prompt-body">
+          <textarea id="agentName" class="copy-source" readonly>Studiengangs-Check: Transparente Zuordnung zu Anforderungsprofilen</textarea>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <div>
+            <strong>Agent-Beschreibung</strong>
+            <div class="muted">Für das Feld „Beschreibung“.</div>
+          </div>
+          <div class="prompt-actions">
+            <button class="btn btn-primary copy-btn" data-copy-target="agentDescription">Beschreibung kopieren</button>
+            <button class="btn btn-secondary download-btn" data-download-target="agentDescription" data-filename="Agent-Beschreibung.txt">Herunterladen</button>
+          </div>
+        </div>
+        <div class="prompt-body">
+          <textarea id="agentDescription" class="copy-source" readonly>Dieser Agent unterstützt die Personalstelle bei der transparenten Vorprüfung, ob Inhalte eines Studiengangs fachlichen Kriterien eines Anforderungsprofils zugeordnet werden können.
+
+Er extrahiert relevante Module und Themen, nennt konkrete Fundstellen und unterscheidet zwischen erfüllt, teilweise erfüllt, nicht belegt und unklar.
+
+Der Agent trifft keine Anerkennungs-, Gleichwertigkeits- oder Einstellungsentscheidung. Seine Ergebnisse sind ausschließlich fachlich zu prüfende Hinweise.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section id="prompt">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">4 · System-Prompt</div>
+          <h2>Vollständige Agent-Anweisung</h2>
+        </div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <div>
+            <strong>System-Prompt / Anweisungen</strong>
+            <div class="muted">Komplett kopieren oder als Textdatei herunterladen.</div>
+          </div>
+          <div class="prompt-actions">
+            <button class="btn btn-primary copy-btn" data-copy-target="systemPrompt">System-Prompt kopieren</button>
+            <button class="btn btn-secondary download-btn" data-download-target="systemPrompt" data-filename="System-Prompt-Studiengangs-Check.txt">Herunterladen</button>
+          </div>
+        </div>
+        <div class="prompt-body">
+          <textarea id="systemPrompt" class="copy-source" style="min-height:980px" readonly>## Rolle
+
+Du bist ein unterstützender Studiengangs- und Kriterienprüfer.
+
+Du unterstützt eine Personalstelle dabei, Inhalte eines Studiengangs transparent einem fachlichen Anforderungsprofil zuzuordnen.
+
+Du triffst keine Anerkennungsentscheidung, keine Gleichwertigkeitsentscheidung und keine Einstellungsentscheidung.
+
+## Arbeitsgrundlage
+
+Verwende ausschließlich:
+
+1. das bereitgestellte Anforderungsprofil,
+2. die bereitgestellte Studiengangsbeschreibung,
+3. die bereitgestellten Modulbeschreibungen oder sonstigen Studienunterlagen.
+
+Erfinde keine Module, Inhalte, ECTS-Punkte, Praxisanteile, Hochschulmerkmale oder Lernergebnisse.
+
+Wenn Informationen fehlen, markiere dies ausdrücklich.
+
+## Prüflogik
+
+Prüfe jedes Kriterium des Anforderungsprofils einzeln.
+
+Ordne das Ergebnis genau einer der folgenden Kategorien zu:
+
+### A – Erfüllt
+
+Das Kriterium ist durch konkrete Inhalte oder Module klar belegt.
+
+### B – Teilweise erfüllt
+
+Es gibt passende Inhalte, aber Umfang, Tiefe oder Schwerpunkt bleiben begrenzt oder nicht vollständig belegt.
+
+### C – Nicht belegt
+
+In den vorliegenden Unterlagen findet sich kein belastbarer Nachweis.
+
+### D – Unklar
+
+Die Angaben reichen nicht aus, um eine belastbare Zuordnung vorzunehmen.
+
+## Vorgehensweise
+
+1. Extrahiere alle relevanten Studieninhalte.
+2. Ordne jeden relevanten Inhalt einem oder mehreren Kriterien zu.
+3. Nenne zu jeder Zuordnung eine konkrete Fundstelle.
+4. Unterscheide klar zwischen ausdrücklich belegten Inhalten und deiner fachlichen Einordnung.
+5. Markiere fehlende Informationen und offene Fragen.
+6. Vermeide pauschale Aussagen über die Eignung des gesamten Studiengangs.
+
+## Verbindliche Grenzen
+
+Du darfst nicht:
+
+- die formale Gleichwertigkeit eines Abschlusses feststellen,
+- eine Anerkennung empfehlen oder ablehnen,
+- den Studiengang pauschal als geeignet oder ungeeignet bewerten,
+- aus dem Namen der Hochschule auf Qualität schließen,
+- aus dem Titel des Studiengangs allein auf Inhalte schließen,
+- fehlende Modulbeschreibungen ergänzen,
+- ECTS-Punkte schätzen,
+- rechtliche Bewertungen vornehmen,
+- behaupten, dass das Ergebnis rechtssicher oder abschließend ist.
+
+## Ausgabeformat
+
+Beginne mit der Überschrift:
+
+„Ergebnis der unterstützenden Studiengangszuordnung“
+
+Erstelle anschließend eine Tabelle mit den Spalten:
+
+1. Kriterium des Anforderungsprofils,
+2. Kategorie A bis D,
+3. relevante Studieninhalte oder Module,
+4. konkrete Fundstelle,
+5. Begründung der Zuordnung,
+6. Unsicherheit oder fehlende Information,
+7. fachlicher Prüfhinweis.
+
+## Regeln für Fundstellen
+
+- Nenne Modulnamen möglichst wörtlich.
+- Nenne Kapitel, Abschnitt oder Seitenangabe, wenn vorhanden.
+- Verwende keine Fundstelle, die in den Unterlagen nicht enthalten ist.
+- Wenn keine belastbare Fundstelle vorhanden ist, schreibe ausdrücklich „keine belastbare Fundstelle vorhanden“.
+
+## Zusammenfassung
+
+Schließe mit folgender Zusammenfassung:
+
+- Anzahl erfüllter Kriterien:
+- Anzahl teilweise erfüllter Kriterien:
+- Anzahl nicht belegter Kriterien:
+- Anzahl unklarer Kriterien:
+- wichtigste offene Informationen:
+- erforderlicher fachlicher Prüfschritt:
+
+Formuliere anschließend eine kurze, neutrale Entscheidungsvorlage für die fachliche Prüfung.
+
+Diese Entscheidungsvorlage darf keine Anerkennungs- oder Einstellungsentscheidung enthalten. Sie soll lediglich die belegten Inhalte, Unsicherheiten und offenen Punkte zusammenfassen.
+
+## Qualitätssicherung
+
+Prüfe vor deiner Antwort:
+
+- Habe ich ausschließlich bereitgestellte Unterlagen verwendet?
+- Habe ich jede Zuordnung mit einer Fundstelle belegt?
+- Habe ich keine Module oder Inhalte erfunden?
+- Habe ich zwischen erfüllt, teilweise erfüllt, nicht belegt und unklar unterschieden?
+- Habe ich Unsicherheiten sichtbar gemacht?
+- Habe ich keine Gleichwertigkeits- oder Einstellungsentscheidung getroffen?
+- Habe ich nicht aus dem Studiengangstitel allein geschlossen?
+
+Falls eine dieser Bedingungen nicht erfüllt ist, korrigiere deine Antwort vor der Ausgabe.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section id="anforderungen">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">5 · Prüfbasis</div>
+          <h2>Anforderungsprofil</h2>
+        </div>
+      </div>
+
+      <div class="callout">
+        Das Anforderungsprofil muss vor der KI-Nutzung fachlich festgelegt sein. Die KI darf die Kriterien nicht eigenständig erweitern.
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <div>
+            <strong>Synthetisches Anforderungsprofil</strong>
+            <div class="muted">Als verbindliche Prüfbasis in den Agent kopieren.</div>
+          </div>
+          <div class="prompt-actions">
+            <button class="btn btn-primary copy-btn" data-copy-target="requirements">Anforderungsprofil kopieren</button>
+            <button class="btn btn-secondary download-btn" data-download-target="requirements" data-filename="Anforderungsprofil.txt">Herunterladen</button>
+          </div>
+        </div>
+        <div class="prompt-body">
+          <textarea id="requirements" class="copy-source" style="min-height:380px" readonly>## Fachliches Anforderungsprofil
+
+Für die Tätigkeit werden folgende fachliche Inhalte erwartet:
+
+1. Naturwissenschaftliche Grundlagen
+2. Kenntnisse in Biologie oder Biochemie
+3. Grundlagen der Statistik oder Datenanalyse
+4. Labor- oder vergleichbare praktische Erfahrung
+5. Wissenschaftliches Arbeiten
+6. Fähigkeit zur fachübergreifenden Einordnung komplexer Themen
+
+Die Kriterien sollen ausschließlich anhand konkreter Studieninhalte, Module oder Praxisanteile geprüft werden.
+
+Triff keine Gleichwertigkeits- oder Anerkennungsentscheidung.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section id="testfaelle">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">6 · Testfälle</div>
+          <h2>Klarer Fall und schwierige Gegenprobe</h2>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="simple">Klarer Testfall</button>
+        <button class="tab-btn" data-tab="advanced">Schwierige Gegenprobe</button>
+      </div>
+
+      <div id="simple" class="tab-panel active">
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <div>
+              <strong>Klarer Testfall</strong>
+              <div class="muted">Mit gut belegten Modulen und konkreten Inhalten.</div>
+            </div>
+            <div class="prompt-actions">
+              <button class="btn btn-primary copy-btn" data-copy-target="simpleCase">Testfall kopieren</button>
+              <button class="btn btn-secondary download-btn" data-download-target="simpleCase" data-filename="Testfall-Klar.txt">Herunterladen</button>
+            </div>
+          </div>
+          <div class="prompt-body">
+            <textarea id="simpleCase" class="copy-source" style="min-height:760px" readonly>Prüfe den folgenden synthetischen Studiengang anhand des bereits festgelegten Anforderungsprofils.
+
+Verwende ausschließlich die folgenden Angaben und nenne zu jeder Zuordnung eine konkrete Fundstelle.
+
+## Studiengang
+
+Bachelor of Science „Angewandte Lebenswissenschaften“
+
+## Studieninhalte
+
+### Modul 1: Allgemeine und Anorganische Chemie
+Inhalte:
+- chemische Grundbegriffe
+- Stoffeigenschaften
+- Reaktionsgleichungen
+- Laborübungen
+
+### Modul 2: Zellbiologie
+Inhalte:
+- Aufbau und Funktion von Zellen
+- Zellstoffwechsel
+- Zellkommunikation
+- mikroskopische Untersuchungsmethoden
+
+### Modul 3: Biochemie
+Inhalte:
+- Proteine und Enzyme
+- Stoffwechselwege
+- molekulare Grundlagen biologischer Prozesse
+
+### Modul 4: Biostatistik
+Inhalte:
+- deskriptive Statistik
+- Wahrscheinlichkeitsrechnung
+- Hypothesentests
+- Auswertung biologischer Datensätze
+
+### Modul 5: Forschungspraktikum
+Inhalte:
+- Planung eines Laborversuchs
+- Durchführung und Dokumentation
+- Auswertung von Messergebnissen
+- Reflexion von Fehlerquellen
+
+### Modul 6: Wissenschaftliches Projekt
+Inhalte:
+- Literaturrecherche
+- Entwicklung einer Forschungsfrage
+- wissenschaftliche Dokumentation
+- Präsentation und Diskussion der Ergebnisse
+
+### Modul 7: Umweltmikrobiologie
+Inhalte:
+- mikrobielle Systeme
+- Wechselwirkungen zwischen Organismen und Umwelt
+- Bewertung biologischer und chemischer Einflussfaktoren
+
+Gib die vorgesehene Prüftabelle und anschließend eine neutrale Zusammenfassung für die fachliche Prüfung aus.</textarea>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-btn" type="button">
+              Erwartbare Einordnung anzeigen
+              <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+              <ul>
+                <li><strong>Naturwissenschaftliche Grundlagen:</strong> erfüllt, belegt durch Chemie und weitere naturwissenschaftliche Module.</li>
+                <li><strong>Biologie oder Biochemie:</strong> erfüllt, belegt durch Zellbiologie und Biochemie.</li>
+                <li><strong>Statistik oder Datenanalyse:</strong> erfüllt, belegt durch Biostatistik.</li>
+                <li><strong>Labor- oder Praxiserfahrung:</strong> erfüllt, belegt durch Laborübungen und Forschungspraktikum.</li>
+                <li><strong>Wissenschaftliches Arbeiten:</strong> erfüllt, belegt durch das wissenschaftliche Projekt.</li>
+                <li><strong>Fachübergreifende Einordnung:</strong> erfüllt oder teilweise erfüllt, abhängig von der Begründung anhand Umweltmikrobiologie und Projektarbeit.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="advanced" class="tab-panel">
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <div>
+              <strong>Schwierige Gegenprobe</strong>
+              <div class="muted">Mit allgemeinen Modulnamen, fehlenden ECTS und unklarer fachlicher Tiefe.</div>
+            </div>
+            <div class="prompt-actions">
+              <button class="btn btn-primary copy-btn" data-copy-target="advancedCase">Gegenprobe kopieren</button>
+              <button class="btn btn-secondary download-btn" data-download-target="advancedCase" data-filename="Testfall-Gegenprobe.txt">Herunterladen</button>
+            </div>
+          </div>
+          <div class="prompt-body">
+            <textarea id="advancedCase" class="copy-source" style="min-height:760px" readonly>Prüfe den folgenden synthetischen Studiengang anhand des bereits festgelegten Anforderungsprofils.
+
+Achte besonders darauf, fehlende Informationen und unklare Inhalte sichtbar zu machen.
+
+## Studiengang
+
+Bachelor „Innovative Gesundheits- und Technologiestudien“
+
+## Studieninhalte
+
+### Modul A: Grundlagen moderner Systeme
+Kurzbeschreibung:
+Einführung in verschiedene naturwissenschaftliche und technische Denkweisen.
+
+### Modul B: Gesundheit und Gesellschaft
+Kurzbeschreibung:
+Überblick über gesellschaftliche, organisatorische und gesundheitliche Fragestellungen.
+
+### Modul C: Daten verstehen
+Kurzbeschreibung:
+Grundlagen der Arbeit mit Daten und digitalen Werkzeugen.
+
+### Modul D: Projektlabor
+Kurzbeschreibung:
+Bearbeitung einer praktischen Aufgabenstellung in Gruppen.
+
+### Modul E: Wissenschaft und Kommunikation
+Kurzbeschreibung:
+Einführung in wissenschaftliche Texte und Präsentationstechniken.
+
+### Modul F: Wahlpflichtbereich
+Kurzbeschreibung:
+Individuelle Vertiefung nach Wahl.
+
+Weitere Angaben:
+- keine ECTS-Angaben vorhanden
+- keine detaillierten Modulbeschreibungen vorhanden
+- keine Angaben zu Laborgeräten oder Versuchsmethoden
+- keine Angaben zu Biologie oder Biochemie
+- keine Angaben zum Umfang statistischer Methoden
+
+Ordne jedes Kriterium vorsichtig ein. Verwende „unklar“ oder „nicht belegt“, wenn die Angaben nicht ausreichen. Triff keine pauschale Aussage zur Eignung des Studiengangs.</textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="arbeitsauftraege">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">7 · Arbeitsaufträge</div>
+          <h2>Prompts für Prüfung, Verdichtung und Verbesserung</h2>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <article class="prompt-card">
+          <div class="prompt-head">
+            <div>
+              <strong>Zuordnung kritisch prüfen</strong>
+              <div class="muted">Nach dem ersten Durchlauf.</div>
+            </div>
+            <div class="prompt-actions">
+              <button class="btn btn-primary copy-btn" data-copy-target="reviewPrompt">Kopieren</button>
+              <button class="btn btn-secondary download-btn" data-download-target="reviewPrompt" data-filename="Prompt-Zuordnung-pruefen.txt">Download</button>
+            </div>
+          </div>
+          <div class="prompt-body">
+            <textarea id="reviewPrompt" class="copy-source" readonly>Prüfe deine bisherige Zuordnung erneut.
+
+Kontrolliere insbesondere:
+
+1. Ist jede Einstufung mit einer konkreten Fundstelle belegt?
+2. Hast du aus dem Studiengangstitel allein geschlossen?
+3. Hast du Inhalte, ECTS-Punkte oder Praxisanteile erfunden?
+4. Sind teilweise erfüllte und unklare Kriterien ausreichend vorsichtig formuliert?
+5. Wurde eine Gleichwertigkeits- oder Eignungsentscheidung vermieden?
+6. Sind fehlende Informationen klar benannt?
+
+Korrigiere die Ausgabe, falls erforderlich.</textarea>
+          </div>
+        </article>
+
+        <article class="prompt-card">
+          <div class="prompt-head">
+            <div>
+              <strong>Offene Informationen ableiten</strong>
+              <div class="muted">Für eine gezielte Nachforderung.</div>
+            </div>
+            <div class="prompt-actions">
+              <button class="btn btn-primary copy-btn" data-copy-target="missingPrompt">Kopieren</button>
+              <button class="btn btn-secondary download-btn" data-download-target="missingPrompt" data-filename="Prompt-Offene-Informationen.txt">Download</button>
+            </div>
+          </div>
+          <div class="prompt-body">
+            <textarea id="missingPrompt" class="copy-source" readonly>Leite aus deiner Analyse eine kompakte Liste offener Informationen ab.
+
+Nenne ausschließlich Informationen, die für die fachliche Zuordnung tatsächlich fehlen, zum Beispiel:
+
+- detaillierte Modulbeschreibung,
+- Umfang oder ECTS,
+- konkrete Labor- oder Praxisanteile,
+- verwendete statistische Methoden,
+- Lernergebnisse,
+- Prüfungsform.
+
+Formuliere zu jedem Punkt eine neutrale Nachforderung. Triff keine Anerkennungsentscheidung.</textarea>
+          </div>
+        </article>
+
+        <article class="prompt-card">
+          <div class="prompt-head">
+            <div>
+              <strong>Neutrale Entscheidungsvorlage</strong>
+              <div class="muted">Für die fachliche Prüfung.</div>
+            </div>
+            <div class="prompt-actions">
+              <button class="btn btn-primary copy-btn" data-copy-target="summaryPrompt">Kopieren</button>
+              <button class="btn btn-secondary download-btn" data-download-target="summaryPrompt" data-filename="Prompt-Entscheidungsvorlage.txt">Download</button>
+            </div>
+          </div>
+          <div class="prompt-body">
+            <textarea id="summaryPrompt" class="copy-source" readonly>Erstelle aus der Prüftabelle eine neutrale fachliche Entscheidungsvorlage.
+
+Struktur:
+
+1. belegte fachliche Inhalte,
+2. teilweise belegte Inhalte,
+3. nicht belegte Inhalte,
+4. unklare Punkte,
+5. noch benötigte Unterlagen,
+6. erforderlicher fachlicher Prüfschritt.
+
+Die Vorlage darf keine Anerkennungs-, Gleichwertigkeits- oder Einstellungsentscheidung enthalten.</textarea>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="auswertung">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">8 · Auswertung</div>
+          <h2>Qualität des Agent-Ergebnisses bewerten</h2>
+        </div>
+      </div>
+
+      <div class="test-card">
+        <p class="muted">Bewerten Sie jede Kategorie mit 0, 1 oder 2 Punkten.</p>
+
+        <div class="score-grid">
+          <label for="s1">Jede Einstufung mit Fundstelle belegt</label>
+          <select id="s1" class="score-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+
+          <label for="s2">Keine Inhalte oder ECTS erfunden</label>
+          <select id="s2" class="score-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+
+          <label for="s3">Kategorien sauber unterschieden</label>
+          <select id="s3" class="score-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+
+          <label for="s4">Unsicherheiten klar benannt</label>
+          <select id="s4" class="score-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+
+          <label for="s5">Keine pauschale Eignungsentscheidung</label>
+          <select id="s5" class="score-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+
+          <label for="s6">Fachlicher Prüfschritt nachvollziehbar</label>
+          <select id="s6" class="score-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+        </div>
+
+        <div class="score-result" id="scoreResult">Gesamt: 0 von 12 Punkten</div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="grid-3">
+        <article class="card">
+          <div class="icon-box">✓</div>
+          <h3>Gute Agent-Leistung</h3>
+          <p class="muted">Die Zuordnung ist fundstellenbasiert, vorsichtig und klar von der fachlichen Entscheidung getrennt.</p>
+        </article>
+        <article class="card">
+          <div class="icon-box">!</div>
+          <h3>Warnsignal</h3>
+          <p class="muted">Der Agent schließt aus Studiengangstiteln, erfindet Inhalte oder erklärt einen Abschluss pauschal für geeignet.</p>
+        </article>
+        <article class="card">
+          <div class="icon-box">→</div>
+          <h3>Nächster Schritt</h3>
+          <p class="muted">Fehlende Modulunterlagen gezielt nachfordern und die Zuordnung anschließend fachlich erneut prüfen.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      Workshopmaterial „Studiengangs-Check“ · Für Demonstrations- und Lernzwecke · Keine Anerkennungs- oder Einstellungsentscheidung
+    </div>
+  </footer>
+
+  <script>
+    const toast = document.getElementById("copyToast");
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function downloadText(content, filename) {
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelectorAll(".copy-btn").forEach(button => {
+      button.addEventListener("click", async () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        try {
+          await navigator.clipboard.writeText(target.value);
+          showToast("Text wurde kopiert.");
+        } catch (error) {
+          target.select();
+          document.execCommand("copy");
+          showToast("Text wurde kopiert.");
+        }
+      });
+    });
+
+    document.querySelectorAll(".download-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.downloadTarget);
+        downloadText(target.value, button.dataset.filename || "Prompt.txt");
+        showToast("Textdatei wurde erstellt.");
+      });
+    });
+
+    document.getElementById("downloadAllBtn").addEventListener("click", () => {
+      const parts = [
+        ["AGENT-NAME", "agentName"],
+        ["AGENT-BESCHREIBUNG", "agentDescription"],
+        ["SYSTEM-PROMPT", "systemPrompt"],
+        ["ANFORDERUNGSPROFIL", "requirements"],
+        ["KLARER TESTFALL", "simpleCase"],
+        ["SCHWIERIGE GEGENPROBE", "advancedCase"],
+        ["PROMPT: ZUORDNUNG PRÜFEN", "reviewPrompt"],
+        ["PROMPT: OFFENE INFORMATIONEN", "missingPrompt"],
+        ["PROMPT: ENTSCHEIDUNGSVORLAGE", "summaryPrompt"]
+      ];
+
+      const text = parts.map(([title, id]) => {
+        return "==================================================\n" +
+               title + "\n" +
+               "==================================================\n\n" +
+               document.getElementById(id).value;
+      }).join("\n\n\n");
+
+      downloadText(text, "Studiengangs-Check-Prompt-Paket.txt");
+      showToast("Prompt-Paket wurde erstellt.");
+    });
+
+    document.querySelectorAll(".accordion-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        button.closest(".accordion-item").classList.toggle("open");
+      });
+    });
+
+    document.querySelectorAll(".tab-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn === button));
+        document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("active", panel.id === target));
+      });
+    });
+
+    const checks = [...document.querySelectorAll(".progress-check")];
+    const progressRing = document.getElementById("progressRing");
+    const progressText = document.getElementById("progressText");
+    const statusItems = [...document.querySelectorAll(".status-item")];
+
+    function updateProgress() {
+      const done = checks.filter(c => c.checked).length;
+      const percent = Math.round((done / checks.length) * 100);
+      const degrees = Math.round((percent / 100) * 360);
+
+      progressText.textContent = percent + "%";
+      progressRing.style.background = `conic-gradient(var(--accent) ${degrees}deg, #e5ebf4 ${degrees}deg)`;
+
+      statusItems.forEach((item, index) => {
+        item.classList.toggle("done", checks[index]?.checked);
+      });
+
+      localStorage.setItem("degreeCheckProgress", JSON.stringify(checks.map(c => c.checked)));
+    }
+
+    const saved = JSON.parse(localStorage.getItem("degreeCheckProgress") || "[]");
+    checks.forEach((check, index) => {
+      if (typeof saved[index] === "boolean") check.checked = saved[index];
+      check.addEventListener("change", updateProgress);
+    });
+    updateProgress();
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      checks.forEach(c => c.checked = false);
+      localStorage.removeItem("degreeCheckProgress");
+      updateProgress();
+      showToast("Fortschritt wurde zurückgesetzt.");
+    });
+
+    const scoreSelects = [...document.querySelectorAll(".score-select")];
+    const scoreResult = document.getElementById("scoreResult");
+
+    function updateScore() {
+      const score = scoreSelects.reduce((sum, s) => sum + Number(s.value), 0);
+      let note = "";
+      if (score >= 10) note = " · Gute Ausgangsbasis für weitere Tests";
+      else if (score >= 7) note = " · Einzelne Regeln gezielt nachschärfen";
+      else note = " · Deutlicher Überarbeitungsbedarf";
+
+      scoreResult.textContent = `Gesamt: ${score} von 12 Punkten${note}`;
+    }
+
+    scoreSelects.forEach(s => s.addEventListener("change", updateScore));
+    updateScore();
+
+    const sections = [...document.querySelectorAll("main section")];
+    const navLinks = [...document.querySelectorAll(".nav-link")];
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.classList.toggle("active", link.getAttribute("href") === "#" + entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
